@@ -28,16 +28,22 @@ def boxes():
                         yield (x,y,z,x,y,z+2)
 
 def build():
-    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.1.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
+    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.2.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
     write('data/minecraft/tags/function/load.json', json.dumps({'values':['flusgrid:load']}))
     function('load', [
         'scoreboard objectives add flusgrid dummy',
+        'scoreboard players set #quiet flusgrid 0',
+        'execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"',
         'scoreboard players set #sixteen flusgrid 16',
         'execute unless data storage flusgrid:ledger regions run data modify storage flusgrid:ledger regions set value {}',
     ])
-    function('help', ['tellraw @a {text:"FlusGrid 0.1.0: disposable local worlds only. Convert an aligned 16-cube with /function flusgrid:convert {x:0,y:64,z:0}. Overworld only; all origins must be multiples of 16. No automatic conversion.",color:"yellow"}'])
+    from area import build_area
+    build_area(write, function)
+    function('help', ['tellraw @a {text:"FlusGrid 0.2.0: disposable Creative worlds only. /function flusgrid:area_here prepares 48x48 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Overworld only.",color:"yellow"}'])
     function('convert', [
         '# Operator API. Explicit integer origins; no relative coordinates.',
+        'execute if data storage flusgrid:job {state:"running"} run return 0',
+        'execute if data storage flusgrid:job {state:"paused"} run return 0',
         'execute unless dimension minecraft:overworld run return run tellraw @a {text:"FlusGrid: Overworld only.",color:"red"}',
         '$scoreboard players set #x flusgrid $(x)',
         '$scoreboard players set #y flusgrid $(y)',
@@ -67,7 +73,7 @@ def build():
         '$execute unless score #uncleared flusgrid matches 0 run data modify storage flusgrid:ledger regions."$(x),$(y),$(z)" set value "failed"',
         'execute unless score #uncleared flusgrid matches 0 run return run tellraw @a {text:"FlusGrid: verification FAILED. Region is locked; restore your disposable world backup. Do not retry by deleting the ledger.",color:"red"}',
         '$data modify storage flusgrid:ledger regions."$(x),$(y),$(z)" set value "complete"',
-        '$tellraw @a {text:"FlusGrid: converted cube at $(x), $(y), $(z). Four-block spacing; 64 grid positions retained. Later physics can change blocks.",color:"green"}',
+        '$execute unless score #quiet flusgrid matches 1 run tellraw @a {text:"FlusGrid: converted cube at $(x), $(y), $(z). Four-block spacing; 64 grid positions retained. Later physics can change blocks.",color:"green"}',
     ])
     function('internal/carve', ['# Generated; strict suppresses immediate neighbor/shape updates.'] + [
         'fill ' + ' '.join(f'~{v}' for v in box) + ' minecraft:air strict' for box in boxes()
@@ -77,7 +83,7 @@ def build():
         for x in range(16) for y in range(16) for z in range(16)
         if x%4 or y%4 or z%4
     ])
-    out = ROOT / 'dist' / 'FlusGrid-0.1.0-experimental.zip'
+    out = ROOT / 'dist' / 'FlusGrid-0.2.0-experimental.zip'
     out.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         for p in sorted(PACK.rglob('*')):

@@ -1,4 +1,6 @@
 # Operator API. Explicit integer origins; no relative coordinates.
+execute if data storage flusgrid:job {state:"running"} run return 0
+execute if data storage flusgrid:job {state:"paused"} run return 0
 execute unless dimension minecraft:overworld run return run tellraw @a {text:"FlusGrid: Overworld only.",color:"red"}
 $scoreboard players set #x flusgrid $(x)
 $scoreboard players set #y flusgrid $(y)

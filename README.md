@@ -12,11 +12,11 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 
 ## Status
 
-**0.1.0 experimental prototype:** a manually invoked Overworld converter for one aligned 16×16×16 cube, with four-block grid spacing. It retains existing blocks at grid positions, uses strict removal, verifies cleared positions, and records processed cubes to refuse retries.
+**0.2.0 experimental prototype:** `/function flusgrid:area_here` converts the current chunk and eight neighbors through the full Overworld height (48×48×384). It retains original blocks on a four-block grid and processes one 16-cube per tick. Completed cubes are skipped; jobs pause for unloaded chunks, reloads, and interrupted/failed cubes.
 
-This is not a full-world generator or a Realms-ready survival release. Grid spacing is an experimental choice, not an established RaysGrid specification.
+This is a bounded terrain test, not an automatic full-world generator or a Realms-ready survival release. Grid spacing is experimental.
 
-- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.1.0-experimental.zip)
+- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.2.0-experimental.zip)
 - [Installation and local demonstration](docs/TESTING.md)
 - [Test results](docs/TEST_RESULTS.md)
 - [Design plan](docs/DESIGN.md)

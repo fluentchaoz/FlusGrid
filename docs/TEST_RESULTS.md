@@ -1,4 +1,22 @@
-# Prototype 0.1.0 validation
+# Validation history
+
+## 0.2.0 full-height area (2026-11-07)
+
+Tested on the same vanilla Java 26.3 / Java 25.0.5 runtime, using the explicit `area_start` API in a headless server. No graphical client or Realm test.
+
+- 48×48×384 fixture (884,736 positions) completed all 216 queued cubes.
+- Verified all 13,824 retained grid positions and 13,824 off-grid air samples: zero failures, completion sentinel 1. Production also verifies all 4,032 removed positions within each cube during conversion.
+- Retained diamond ore at Y -64, an X-axis oak log at Y 316, and a west-facing chest containing seven diamonds.
+- A gold block immediately outside the selected area remained untouched.
+- Paused at cube 116; a replacement start request was refused. Reload and clean stop/start retained the count and paused state. Resume completed the remaining work.
+- Repeating the completed area skipped all cubes and preserved a newly placed off-grid gold block.
+- An unloaded-area request paused with done=0, before conversion.
+- Negative remainder arithmetic was checked in the actual scoreboard: -1 modulo 16 = 15, matching the player wrapper alignment calculation.
+- Three Python tests pass: cube complement geometry, grid phase across negative origins, and queue coverage/order/uniqueness.
+
+The player-only `area_here` wrapper loaded successfully but has not been exercised through a connected graphical player. The conversion backend was runtime-tested. Full natural-terrain physics and Realms throughput remain unverified.
+
+## 0.1.0 single-cube validation
 
 Date: 2026-11-07. Tested in a headless vanilla Java 26.3 dedicated server on Temurin Java 25.0.5. No graphical client or Realm was used.
 

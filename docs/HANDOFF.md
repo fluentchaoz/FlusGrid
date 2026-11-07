@@ -2,30 +2,33 @@
 
 Updated: 2026-11-07
 
-## Confirmed scope
+## Scope
 
-FlusGrid is Ryan's independent RaysGrid-inspired project for Java 26.3. Start with a fresh world, aim for a vanilla datapack on Java Realms, and import into Flunkstar after the playthrough. Do not silently substitute a server plugin or client mod.
+Fresh RaysGrid-inspired Java 26.3 world, vanilla datapack targeting Java Realms; archive in Flunkstar after the playthrough. No plugin/client-mod substitution without discussion.
 
-## Current implementation
+## Current build: 0.2.0 experimental
 
-0.1.0 experimental prototype is in `datapack/`, with a distributable ZIP in `dist/`. `tools/build.py` generates both using Python's standard library.
+Ryan successfully tested the 0.1.0 floating stone cube. He confirmed that the goal is to remove terrain between grid positions while retaining the actual original blocks. He requested the next full-height terrain test.
 
-Public command: `/function flusgrid:convert {x:0,y:64,z:0}`. It converts exactly one aligned 16-cube in the Overworld. Origins must be multiples of 16, Y -64..304. Experimental spacing is 4 (64 retained positions / 4096). Off-grid positions are cleared with strict fills; retained blocks are not rewritten. There are 124 disjoint fill boxes, then 4,032 cleared-position checks.
+`/function flusgrid:area_here` selects the player's current chunk and eight neighbors (48x48), full Overworld height -64..319. Creative/Spectator caller required. Explicit aligned-minimum-corner API: `/function flusgrid:area_start {x:128,z:128}`. It queues 216 cubes, top down within each chunk, one cube per tick. No automatic exploration yet.
 
-Storage `flusgrid:ledger` has a `regions` compound keyed by canonical integer origins. Any existing entry blocks reprocessing. States: started, complete, failed. Reload never clears this storage. Interrupted or failed cubes have no automatic retry path. There is no tick function, automatic exploration, worldgen override, or dimension-wide conversion.
+Controls: `flusgrid:status`, `flusgrid:pause`, `flusgrid:resume`. Only one job may run/be paused at a time. Unloaded next chunks pause instead of force-loading. On load/reload a running job becomes paused. Completed ledger entries are skipped. Started/failed entries pause and refuse retry. No cancel/reset command yet.
 
-`flusgrid` scoreboard and `flusgrid:work` storage are scratch state. `internal/*` functions must not be called directly. Runtime commands execute synchronously; this is not a scalable queue yet.
+The persistent job is in `flusgrid:job`: state, pending list, done, total. Shared temporary coordinates are in `flusgrid:work`; scoreboard `flusgrid` holds scratch values. Single-cube public conversion is blocked while an area job runs or is paused. No asynchronous work occurs inside one cube. This is normal saved state, not a crash-atomic transaction.
 
-## Validation
+`flusgrid:ledger` regions uses canonical integer x,y,z keys and started/complete/failed values. Each cube is 16^3 with experimental four-block spacing: 64 untouched grid positions, 124 strict fill commands, 4,032 cleared-position checks. Previously processed cubes are never deliberately re-cleared, even if physics or builds have changed their contents.
 
-Actual vanilla 26.3 server, Java 25.0.5: cube geometry, negative origins, retained chest contents/state, natural sample comparisons, repeat protection, reload/restart persistence, and deliberate failed-conversion lock tested. See `docs/TEST_RESULTS.md` for limits and harness caveat. No Realms, graphical, multiplayer, physics stress, or complete survival tests.
+## Files
 
-## Next milestone
+- `tools/build.py`, `tools/area.py`: standard-library Python generators.
+- `datapack/`: generated runtime files.
+- `dist/FlusGrid-0.2.0-experimental.zip`: current test download; 0.1.0 ZIP retained for history only.
+- `docs/TESTING.md`: user upgrade and single-command instructions.
+- `docs/TEST_RESULTS.md`: measured checks and limits.
+- `tests/make_area_tests.py`: destructive full-height runtime fixtures for a new test world.
 
-1. Let Ryan inspect the visible single-cube demonstration in `docs/TESTING.md`.
-2. Test retained fluids, falling blocks, leaf decay, waterlogging, and existing scheduled ticks. Strict fill only suppresses immediate updates.
-3. Decide spacing and structure/progression exceptions before scaling up.
-4. Design and measure a bounded preparation queue, with protection against playing/building in unprepared regions. The current 4,032-check verifier per cube is deliberately conservative, not proven suitable for exploration.
-5. Compare live conversion against local preconversion of a bounded world. Realms remains the target, not a verified claim.
+## Next
 
-Do not call this a playable full-world release. Preserve the ledger when importing or disabling the converter. It is not crash-atomic with world saves; backups remain necessary.
+Observe Ryan's natural-jungle test. Investigate fluid flow, leaf decay, falling blocks, waterlogging, and scheduled ticks; strict fill does not permanently disable physics. Consider test-area boundaries and outside fluids flowing in. Then resolve progression exceptions, spacing, and preparation versus live exploration before trying Realms.
+
+Do not describe this as whole-world generation, a complete survival pack, or tested Realms compatibility. No multiplayer stress or complete progression test exists. Keep documentation and this handoff current.
