@@ -1,0 +1,1 @@
+tellraw @a [{text:"FlusGrid pregen: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | "},{nbt:"percent",storage:"flusgrid:job"},{text:"% | chunks "},{nbt:"chunks",storage:"flusgrid:job"},{text:"/1024 | cubes "},{nbt:"done",storage:"flusgrid:job"},{text:"/24576 | next "},{nbt:"cursor",storage:"flusgrid:job"},{text:" | "},{nbt:"reason",storage:"flusgrid:job"}]

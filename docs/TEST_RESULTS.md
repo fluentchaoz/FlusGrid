@@ -1,5 +1,21 @@
 # Validation history
 
+## 0.3.0 bounded pre-generation (2026-11-07)
+
+**Full 512×512 run completed on vanilla Java 26.3 / Java 25.0.5.** Seed 887314, explicit minimum corner X/Z 4096, no players near the target. Bounds X/Z 4096..4607, Y -64..319. These are 100,663,296 potential block positions, with 1,572,864 grid positions retained where blocks originally existed.
+
+- Actual generated terrain processed: 1,024 chunks, 24,576 cubes; job state complete, percent 100.
+- After a clean stop, `tests/audit_pregen_save.py` independently checked all 24,576 expected keys in saved NBT. Every key was complete; no owned ticket remained.
+- At sampled points while running, force-load query showed exactly the one pre-existing test ticket plus one FlusGrid-owned ticket. Pause/reload/completion left only the pre-existing ticket.
+- Full restart with work in progress preserved done=367 and the cursor, set the job to paused, and removed the owned ticket. Resume completed the remainder.
+- Retained test chest at (4096,304,4096) remained west-facing with seven diamonds after completion.
+- Five Python tests pass, covering cube geometry, negative alignment, 48×48 queue coverage, 512×512 cursor contract and ownership-scoped release generation.
+- No datapack/function parsing errors on the final build.
+
+Initial conversion and pause/reload/restart checks ran at normal tick speed. The bulk completion run used `/tick rate 200` to accelerate developer testing, then restored 20. The pack itself never alters tick rate. This is not a normal-speed benchmark or a Realm throughput claim. An overload warning occurred during the accelerated test.
+
+The saved-ledger audit establishes completed processing, not permanent freedom from subsequent fluid flow, falling blocks or decay. Player-only `pregen_here` has parsed in the server but was not exercised by a connected graphical player; its explicit coordinate backend was tested. Realms, multiplayer stress, timeout induction, abrupt process-crash recovery and full survival progression remain untested.
+
 ## 0.2.0 full-height area (2026-11-07)
 
 Tested on the same vanilla Java 26.3 / Java 25.0.5 runtime, using the explicit `area_start` API in a headless server. No graphical client or Realm test.

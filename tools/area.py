@@ -32,7 +32,7 @@ def build_area(write, function):
             'scoreboard players operation #mod flusgrid %= #sixteen flusgrid',
             'execute unless score #mod flusgrid matches 0 run return 0',
         ]],
-        'data merge storage flusgrid:job {state:"preparing",pending:[],done:0,total:216}',
+        'data merge storage flusgrid:job {kind:"area",state:"preparing",pending:[],done:0,total:216}',
         'function flusgrid:area/enqueue',
         'data modify storage flusgrid:job state set value "running"',
         'tellraw @a {text:"FlusGrid: preparing 48x48 terrain, Y -64 through 319. Stay nearby in Creative/Spectator. /function flusgrid:pause stops between cubes.",color:"yellow"}',
@@ -53,6 +53,7 @@ def build_area(write, function):
                 ]
     function('area/enqueue',lines)
     function('area/tick', [
+        'execute if data storage flusgrid:job {kind:"pregen"} run return run function flusgrid:pregen/tick',
         'execute unless data storage flusgrid:job {state:"running"} run return 0',
         'execute in minecraft:overworld run function flusgrid:area/step',
     ])
@@ -84,6 +85,6 @@ def build_area(write, function):
         'tellraw @a {text:"FlusGrid paused: a cube is failed or interrupted. Inspect /function flusgrid:status. Restore a backup; do not erase the region ledger to retry.",color:"red"}'])
     function('area/unloaded', ['data modify storage flusgrid:job state set value "paused"',
         'tellraw @a {text:"FlusGrid paused: next chunk is unloaded. Stay near the area, let terrain load, then /function flusgrid:resume.",color:"yellow"}'])
-    function('pause', ['execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"','function flusgrid:status'])
-    function('resume', ['execute unless data storage flusgrid:job {state:"paused"} run return run function flusgrid:status','data modify storage flusgrid:job state set value "running"','tellraw @a {text:"FlusGrid resumed. Stay nearby in Creative/Spectator.",color:"yellow"}'])
-    function('status', ['tellraw @a [{text:"FlusGrid job: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | cubes: "},{nbt:"done",storage:"flusgrid:job"},{text:" / "},{nbt:"total",storage:"flusgrid:job"},{text:" | next: "},{nbt:"pending[0]",storage:"flusgrid:job"}]'])
+    function('pause', ['execute in minecraft:overworld run function flusgrid:pregen/release','execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"','function flusgrid:status'])
+    function('resume', ['execute unless data storage flusgrid:job {state:"paused"} run return run function flusgrid:status','data modify storage flusgrid:job wait set value 0','data modify storage flusgrid:job reason set value ""','data modify storage flusgrid:job state set value "running"','tellraw @a {text:"FlusGrid resumed. Keep this preparation world running.",color:"yellow"}'])
+    function('status', ['execute if data storage flusgrid:job {kind:"pregen"} run return run function flusgrid:pregen/status','tellraw @a [{text:"FlusGrid job: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | cubes: "},{nbt:"done",storage:"flusgrid:job"},{text:" / "},{nbt:"total",storage:"flusgrid:job"},{text:" | next: "},{nbt:"pending[0]",storage:"flusgrid:job"}]'])

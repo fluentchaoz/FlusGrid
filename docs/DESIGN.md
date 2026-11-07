@@ -15,7 +15,7 @@ Preserve the original terrain's spatial meaning: ore distribution, biome locatio
 
 ## Initial architecture and prototype
 
-Version 0.1.0 validated a manually invoked single-cube converter. Version 0.2.0 adds a persistent 216-cube queue for a bounded 48x48 full-height area, one cube per tick, with pause/resume and reload pausing. Automatic exploration remains unimplemented. It would need a durable, dimension-aware region ledger, bounded work per tick, and a restart-safe processing state. A repeated clear-around-player loop is unsuitable: it can erase builds and duplicate work when players overlap.
+Version 0.1.0 validated a manually invoked single-cube converter. Version 0.2.0 adds a persistent 216-cube queue for a bounded 48x48 full-height area, one cube per tick, with pause/resume and reload pausing. Version 0.3.0 adds a fixed 512x512 compact-cursor pregen job with one owned force-load ticket, readiness waiting, and ticket release on pause/reload/completion. A full natural-terrain run completed locally; see TEST_RESULTS.md. Automatic exploration remains unimplemented. It would need a durable, dimension-aware region ledger, bounded work per tick, and a restart-safe processing state. A repeated clear-around-player loop is unsuitable: it can erase builds and duplicate work when players overlap.
 
 Implemented first prototype: explicit administrator activation for one disposable test region, no automatic tick-driven terrain deletion on load. Align grid coordinates globally, including negative coordinates and chunk boundaries. Preserve retained blocks in place where possible so block state and block-entity data survive.
 

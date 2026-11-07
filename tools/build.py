@@ -28,18 +28,21 @@ def boxes():
                         yield (x,y,z,x,y,z+2)
 
 def build():
-    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.2.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
+    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.3.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
     write('data/minecraft/tags/function/load.json', json.dumps({'values':['flusgrid:load']}))
     function('load', [
         'scoreboard objectives add flusgrid dummy',
         'scoreboard players set #quiet flusgrid 0',
+        'execute in minecraft:overworld run function flusgrid:pregen/release',
         'execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"',
         'scoreboard players set #sixteen flusgrid 16',
         'execute unless data storage flusgrid:ledger regions run data modify storage flusgrid:ledger regions set value {}',
     ])
     from area import build_area
     build_area(write, function)
-    function('help', ['tellraw @a {text:"FlusGrid 0.2.0: disposable Creative worlds only. /function flusgrid:area_here prepares 48x48 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Overworld only.",color:"yellow"}'])
+    from pregen import build_pregen
+    build_pregen(function)
+    function('help', ['tellraw @a {text:"FlusGrid 0.3.0: disposable Creative worlds only. /function flusgrid:pregen_here prepares 512x512 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Overworld only.",color:"yellow"}'])
     function('convert', [
         '# Operator API. Explicit integer origins; no relative coordinates.',
         'execute if data storage flusgrid:job {state:"running"} run return 0',
@@ -83,7 +86,7 @@ def build():
         for x in range(16) for y in range(16) for z in range(16)
         if x%4 or y%4 or z%4
     ])
-    out = ROOT / 'dist' / 'FlusGrid-0.2.0-experimental.zip'
+    out = ROOT / 'dist' / 'FlusGrid-0.3.0-experimental.zip'
     out.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         for p in sorted(PACK.rglob('*')):
