@@ -6,18 +6,18 @@ Preserve the original terrain's spatial meaning: ore distribution, biome locatio
 
 ## Open decisions
 
-- Grid spacing and coordinate offsets. Keeping one position per n-by-n-by-n cube retains approximately 1/n^3 of eligible positions, not necessarily that fraction of actual terrain blocks. Four-block spacing retains 1/64 of positions; five retains 1/125. Neither is an approved default yet.
+- Final grid spacing and coordinate offsets (prototype uses spacing 4, offset 0). Keeping one position per n-by-n-by-n cube retains approximately 1/n^3 of eligible positions, not necessarily that fraction of actual terrain blocks. Four-block spacing retains 1/64 of positions; five retains 1/125. Neither is an approved default yet.
 - Structure treatment: gridify, preserve selected progression blocks, or preserve entire structures.
 - Fluids: retained sources can flow into cleared space. Waterlogged blocks also require testing.
 - Falling blocks, unsupported vegetation, leaf decay, and block updates may alter the retained grid.
 - Bedrock, Nether roof, spawn platform, portals, End entry and exit, and dragon fight behavior.
 - Whether all three dimensions will share spacing and exceptions.
 
-## Candidate implementation, not yet validated
+## Initial architecture and prototype
 
-A command-based post-generation converter could process bounded regions incrementally. It would need a durable, dimension-aware region ledger, bounded work per tick, and a restart-safe processing state. A repeated clear-around-player loop is unsuitable: it can erase builds and duplicate work when players overlap.
+Version 0.1.0 validates a manually invoked single-cube post-generation converter locally. A future converter could process larger bounded regions incrementally. It would need a durable, dimension-aware region ledger, bounded work per tick, and a restart-safe processing state. A repeated clear-around-player loop is unsuitable: it can erase builds and duplicate work when players overlap.
 
-First prototype: explicit administrator activation for one disposable test region, no automatic tick-driven terrain deletion on load. Align grid coordinates globally, including negative coordinates and chunk boundaries. Preserve retained blocks in place where possible so block state and block-entity data survive.
+Implemented first prototype: explicit administrator activation for one disposable test region, no automatic tick-driven terrain deletion on load. Align grid coordinates globally, including negative coordinates and chunk boundaries. Preserve retained blocks in place where possible so block state and block-entity data survive.
 
 Investigate world-generation facilities before committing to post-processing. Do not assume datapacks provide a plugin-equivalent chunk generation callback or can filter every generation stage with one setting.
 

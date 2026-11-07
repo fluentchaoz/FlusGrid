@@ -1,0 +1,1 @@
+tellraw @a {text:"FlusGrid 0.1.0: disposable local worlds only. Convert an aligned 16-cube with /function flusgrid:convert {x:0,y:64,z:0}. Overworld only; all origins must be multiples of 16. No automatic conversion.",color:"yellow"}

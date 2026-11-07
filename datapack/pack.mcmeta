@@ -1,0 +1,13 @@
+{
+  "pack": {
+    "description": "FlusGrid 0.1.0 \u2014 bounded experimental converter",
+    "min_format": [
+      121,
+      0
+    ],
+    "max_format": [
+      121,
+      0
+    ]
+  }
+}

@@ -2,24 +2,30 @@
 
 Updated: 2026-11-07
 
-## User decisions
+## Confirmed scope
 
-Ryan requested a RaysGrid-style project named FlusGrid for Minecraft Java 26.3. It will be a fresh world, preferably hosted on Java Realms using a datapack. Import into Flunkstar happens only after the playthrough. Do not switch the implementation to Paper/Purpur plugins or require client mods without discussing that change.
+FlusGrid is Ryan's independent RaysGrid-inspired project for Java 26.3. Start with a fresh world, aim for a vanilla datapack on Java Realms, and import into Flunkstar after the playthrough. Do not silently substitute a server plugin or client mod.
 
-## Repository state
+## Current implementation
 
-Documentation-only initialization. README.md and docs/DESIGN.md capture scope, unknowns, candidate implementation, and acceptance checks. No Minecraft runtime tests have been performed. No executable pack exists.
+0.1.0 experimental prototype is in `datapack/`, with a distributable ZIP in `dist/`. `tools/build.py` generates both using Python's standard library.
 
-## Next work
+Public command: `/function flusgrid:convert {x:0,y:64,z:0}`. It converts exactly one aligned 16-cube in the Overworld. Origins must be multiples of 16, Y -64..304. Experimental spacing is 4 (64 retained positions / 4096). Off-grid positions are cleared with strict fills; retained blocks are not rewritten. There are 124 disjoint fill boxes, then 4,032 cleared-position checks.
 
-1. Inspect current vanilla 26.3 datapack/worldgen capabilities and obtain a matching test runtime where available.
-2. Choose the smallest viable conversion experiment; keep activation manual and bounded.
-3. Implement pack scaffolding and a single-region grid conversion, with persistent completion tracking and explicit recovery behavior.
-4. Test actual retained terrain, physics, region boundaries, and reload behavior before adding automatic processing.
-5. Present evidence and a local test build. Record any inability to run Minecraft honestly.
+Storage `flusgrid:ledger` has a `regions` compound keyed by canonical integer origins. Any existing entry blocks reprocessing. States: started, complete, failed. Reload never clears this storage. Interrupted or failed cubes have no automatic retry path. There is no tick function, automatic exploration, worldgen override, or dimension-wide conversion.
 
-Grid spacing, structure exceptions, fluid handling, and dimension rules are still unresolved. Prototype choices may be made as clearly documented experiments; do not turn them into claimed user requirements.
+`flusgrid` scoreboard and `flusgrid:work` storage are scratch state. `internal/*` functions must not be called directly. Runtime commands execute synchronously; this is not a scalable queue yet.
 
-## Continuity
+## Validation
 
-Read README.md, docs/DESIGN.md, and this file before continuing. Keep this handoff current with implemented features, actual test results, unresolved defects, and the next concrete task. Preserve existing user work and never describe untested compatibility as confirmed.
+Actual vanilla 26.3 server, Java 25.0.5: cube geometry, negative origins, retained chest contents/state, natural sample comparisons, repeat protection, reload/restart persistence, and deliberate failed-conversion lock tested. See `docs/TEST_RESULTS.md` for limits and harness caveat. No Realms, graphical, multiplayer, physics stress, or complete survival tests.
+
+## Next milestone
+
+1. Let Ryan inspect the visible single-cube demonstration in `docs/TESTING.md`.
+2. Test retained fluids, falling blocks, leaf decay, waterlogging, and existing scheduled ticks. Strict fill only suppresses immediate updates.
+3. Decide spacing and structure/progression exceptions before scaling up.
+4. Design and measure a bounded preparation queue, with protection against playing/building in unprepared regions. The current 4,032-check verifier per cube is deliberately conservative, not proven suitable for exploration.
+5. Compare live conversion against local preconversion of a bounded world. Realms remains the target, not a verified claim.
+
+Do not call this a playable full-world release. Preserve the ledger when importing or disabling the converter. It is not crash-atomic with world saves; backups remain necessary.

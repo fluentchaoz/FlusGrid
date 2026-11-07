@@ -12,13 +12,15 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 
 ## Status
 
-Project initialized. No playable datapack or terrain converter exists yet. Realms performance and exact generation behavior remain unverified. Do not interpret the target as a compatibility guarantee.
+**0.1.0 experimental prototype:** a manually invoked Overworld converter for one aligned 16×16×16 cube, with four-block grid spacing. It retains existing blocks at grid positions, uses strict removal, verifies cleared positions, and records processed cubes to refuse retries.
 
-## First milestone
+This is not a full-world generator or a Realms-ready survival release. Grid spacing is an experimental choice, not an established RaysGrid specification.
 
-Build and test a small, manually activated Overworld conversion prototype in a disposable local world. It must retain grid-position blocks, record completed regions, and avoid reprocessing player builds. Measure conversion cost before attempting automatic exploration or Realms deployment.
-
-See [design and test plan](docs/DESIGN.md) and [development handoff](docs/HANDOFF.md).
+- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.1.0-experimental.zip)
+- [Installation and local demonstration](docs/TESTING.md)
+- [Test results](docs/TEST_RESULTS.md)
+- [Design plan](docs/DESIGN.md)
+- [Development handoff](docs/HANDOFF.md)
 
 ## Intended play workflow
 
