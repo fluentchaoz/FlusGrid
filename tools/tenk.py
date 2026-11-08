@@ -192,7 +192,7 @@ def build_10k(pack, write, function):
             ]
             f('neighbor_'+short+'_'+edge,[
                 f'scoreboard players operation #target_{axis} flusgrid = #tile_{axis} flusgrid',
-                f'scoreboard players add #target_{axis} flusgrid {offset}',
+                (f'scoreboard players remove #target_{axis} flusgrid 1' if offset == -1 else f'scoreboard players add #target_{axis} flusgrid 512'),
                 f'scoreboard players operation #target_{side} flusgrid = @s fg_{side}',
                 f'function flusgrid:realm/enqueue_{short}',
             ])
