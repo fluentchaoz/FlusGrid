@@ -34,21 +34,35 @@ def build_10k(pack, write, function):
         'execute unless data storage flusgrid:realm pending run data modify storage flusgrid:realm pending set value {overworld:{},nether:{},end:{}}',
         'execute unless data storage flusgrid:realm queue run data modify storage flusgrid:realm queue set value []',
     ])
-    # Setup never migrates or overwrites an active 0.6 world.
-    ef('setup', [
+    # No migration of an active 0.6 world. Smoke mode uses the identical
+    # remote scheduler, with a bounded 256x256 initial square for quick tests.
+    setup_checks = [
         'execute unless data storage flusgrid:realm {state:"idle"} run return run function flusgrid:realm_status',
         'execute if entity @a[gamemode=survival] run return run tellraw @a {text:"Finish setup before Survival joins.",color:"red"}',
         'execute if entity @a[gamemode=adventure] run return 0',
         *[f'execute if data storage {ns}:job {{state:"{state}"}} run return run tellraw @a {{text:"Finish the existing {short} preparation before setup.",color:"red"}}'
           for short, ns, dim, top, low, sections in DIMS for state in ('running', 'paused')],
-        'data merge storage flusgrid:realm {model:10000,state:"preparing",phase:"overworld",manual_pause:0b,live:0b,owner:"overworld"}',
-        'execute in minecraft:overworld run function flusgrid:pregen/rectangle {x:-5008,z:-5008,ex:4976,ez:4976,chunks:390625,total:9375000}',
-        'tellraw @a {text:"FlusGrid 10K setup started. Three 10,000-block-wide squares, one dimension at a time. This can require many days; status/pause/resume remain available.",color:"yellow"}',
-    ])
+    ]
+    for name, smoke, lower, upper, lead, message in [
+        ('setup', '0b', MIN, MAX, 256,
+         "FlusGrid 10K setup started. Preparation may take many days; use realm_status."),
+        ('setup_smoke', '1b', -128, 127, 64,
+         "FlusGrid SMOKE setup started: 256x256 per dimension, then the real tile scheduler. Disposable test worlds only."),
+    ]:
+        ef(name, setup_checks + [
+            f'data merge storage {S} {{model:10000,smoke:{smoke},edge_lead:{lead},state:"preparing",phase:"overworld",manual_pause:0b,live:0b,owner:"overworld",start_bounds:{{min_x:{lower},max_x:{upper},min_z:{lower},max_z:{upper}}}}}',
+            'function flusgrid:realm/initial_start_overworld',
+            f'tellraw @a {{text:"{message}",color:"yellow"}}',
+        ])
+    for short, ns, dim, top, low, sections in DIMS:
+        f('initial_start_' + short, [
+            f'execute if data storage {S} {{smoke:1b}} in {dim} run return run function {ns}:pregen/rectangle {{x:-128,z:-128,ex:112,ez:112,chunks:256,total:{256*sections}}}',
+            f'execute in {dim} run function {ns}:pregen/rectangle {{x:{MIN},z:{MIN},ex:{END_ORIGIN},ez:{END_ORIGIN},chunks:390625,total:{390625*sections}}}',
+        ])
     for i,(short, ns, dim, top, low, sections) in enumerate(DIMS):
         lines = [
             f'execute unless data storage flusgrid:fixtures {short}{{ready:1b}} in {dim} run return run function flusgrid:realm/fixture_tick_{short}',
-            f'data modify storage {S} bounds.{short} set value {{min_x:{MIN},max_x:{MAX},min_z:{MIN},max_z:{MAX}}}',
+            f'data modify storage {S} bounds.{short} set from storage {S} start_bounds',
             f'execute in {dim} run function flusgrid:realm/platform_{short}',
         ]
         if short == 'overworld':
@@ -58,7 +72,7 @@ def build_10k(pack, write, function):
             n,nns,ndim,ntop,nlow,nsections = DIMS[i+1]
             lines += [
                 f'data merge storage {S} {{phase:"{n}",owner:"{n}"}}',
-                f'execute in {ndim} run function {nns}:pregen/rectangle {{x:{MIN},z:{MIN},ex:{END_ORIGIN},ez:{END_ORIGIN},chunks:390625,total:{390625*nsections}}}',
+                f'function flusgrid:realm/initial_start_{n}',
             ]
         else:
             lines += [
@@ -156,7 +170,8 @@ def build_10k(pack, write, function):
             *[f'execute store result score @s fg_{a} run data get entity @s Pos[{i}] 1' for a,i in [('x',0),('y',1),('z',2)]],
             'scoreboard players set #inside flusgrid 0',
             'scoreboard players set #main flusgrid 0',
-            f'execute if score @s fg_x matches {MIN}..{MAX} if score @s fg_z matches {MIN}..{MAX} run scoreboard players set #main flusgrid 1',
+            *[f'execute store result score #b{edge} flusgrid run data get storage {S} bounds.{short}.{edge}' for edge in ('min_x','max_x','min_z','max_z')],
+            'execute if score @s fg_x >= #bmin_x flusgrid if score @s fg_x <= #bmax_x flusgrid if score @s fg_z >= #bmin_z flusgrid if score @s fg_z <= #bmax_z flusgrid run scoreboard players set #main flusgrid 1',
             'execute if score #main flusgrid matches 1 run scoreboard players set #inside flusgrid 1',
             'function flusgrid:realm/tile_coords',
             f'execute if score #inside flusgrid matches 0 run function flusgrid:realm/tile_lookup_{short} with storage {S} scratch.tile',
@@ -172,16 +187,21 @@ def build_10k(pack, write, function):
             f'function flusgrid:realm/enqueue_{short}',
         ])
         main=[]
-        for edge,axis,threshold,coord in [
-            ('west','x',f'..{MIN+256}',MIN-1),
-            ('east','x',f'{MAX-256}..',MAX+1),
-            ('north','z',f'..{MIN+256}',MIN-1),
-            ('south','z',f'{MAX-256}..',MAX+1),
+        for edge,axis,sign in [
+            ('west','x','min'), ('east','x','max'),
+            ('north','z','min'), ('south','z','max'),
         ]:
-            main.append(f'execute if score @s fg_{axis} matches {threshold} run function flusgrid:realm/main_{short}_{edge}')
+            main += [
+                f'scoreboard players operation #threshold flusgrid = #b{sign}_{axis} flusgrid',
+                f'execute store result score #lead flusgrid run data get storage {S} edge_lead',
+                ('scoreboard players add #threshold flusgrid 0' if sign == 'min' else 'scoreboard players remove #threshold flusgrid 0'),
+                f'scoreboard players operation #threshold flusgrid {"+=" if sign=="min" else "-="} #lead flusgrid',
+                f'execute if score @s fg_{axis} {"<=" if sign=="min" else ">="} #threshold flusgrid run function flusgrid:realm/main_{short}_{edge}',
+            ]
             side='z' if axis=='x' else 'x'
             f('main_'+short+'_'+edge,[
-                f'scoreboard players set #target_{axis} flusgrid {coord}',
+                f'scoreboard players operation #target_{axis} flusgrid = #b{sign}_{axis} flusgrid',
+                (f'scoreboard players remove #target_{axis} flusgrid 1' if sign=='min' else f'scoreboard players add #target_{axis} flusgrid 1'),
                 f'scoreboard players operation #target_{side} flusgrid = @s fg_{side}',
                 f'function flusgrid:realm/enqueue_{short}',
             ])
