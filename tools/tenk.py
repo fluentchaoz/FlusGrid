@@ -154,9 +154,17 @@ def build_10k(pack, write, function):
         ]],
     ])
     # A single queue, persistent across save/reload, with per-dimension dedupe.
+    # Dispatch from a copied queue head. An execute-if-data command takes a
+    # *single* NBT path, not "queue[0] {dimension:...}" as two arguments.
+    # Match the root compound instead; the former generated invalid commands
+    # and caused queued tiles never to start despite the controller being ready.
     f('tile_start', [
-        f'execute if data storage {S} queue[0] {{dimension:"{short}"}} run function flusgrid:realm/tile_start_{short} with storage {S} queue[0]'
-        for short, ns, dim, top, low, sections in DIMS
+        f'data modify storage {S} dispatch set from storage {S} queue[0]',
+        *[
+            f'execute if data storage {S} {{dispatch:{{dimension:"{short}"}}}} run function flusgrid:realm/tile_start_{short} with storage {S} dispatch'
+            for short, ns, dim, top, low, sections in DIMS
+        ],
+        f'data remove storage {S} dispatch',
     ])
     for short,ns,dim,top,low,sections in DIMS:
         idx=DIM_INDEX[short]
