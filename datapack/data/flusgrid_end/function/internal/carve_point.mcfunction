@@ -1,0 +1,1 @@
+execute unless predicate flusgrid_end:podium unless predicate flusgrid_end:arrival unless block ~ ~ ~ minecraft:bedrock unless block ~ ~ ~ minecraft:end_portal unless block ~ ~ ~ minecraft:end_gateway positioned ~-6 ~-5 ~-6 unless entity @e[type=minecraft:marker,tag=flusgrid_cap,dx=12,dy=10,dz=12] positioned ~6 ~5 ~6 run setblock ~ ~ ~ minecraft:air strict

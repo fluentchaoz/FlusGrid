@@ -1,4 +1,8 @@
+$execute if data storage flusgrid_end:ledger regions{"$(x),$(y),$(z)":"protected"} run data remove storage flusgrid_end:ledger regions."$(x),$(y),$(z)"
 $execute positioned $(x) 0 $(z) unless loaded ~ ~ ~ run return run function flusgrid_end:pregen/wait
+data modify storage flusgrid_end:job wait set value 0
+$execute positioned $(x) $(y) $(z) if predicate flusgrid_end:arena_cube run return run function flusgrid_end:mask/process with storage flusgrid_end:job cursor
+$execute positioned $(x) $(y) $(z) if predicate flusgrid_end:arrival_cube run return run function flusgrid_end:mask/process with storage flusgrid_end:job cursor
 data modify storage flusgrid_end:job wait set value 0
 $execute if data storage flusgrid_end:ledger regions{"$(x),$(y),$(z)":"complete"} run return run function flusgrid_end:pregen/skip with storage flusgrid_end:job cursor
 $execute if data storage flusgrid_end:ledger regions."$(x),$(y),$(z)" run return run function flusgrid_end:pregen/blocked

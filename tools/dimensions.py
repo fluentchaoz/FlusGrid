@@ -31,28 +31,6 @@ def build_dimensions(pack,write,function):
             function(f'{short}_{name}',[f'$function {ns}:{name} {{x:$(x),z:$(z)}}'])
         for name in ('pause','resume','status'):
             function(f'{short}_{name}',[f'execute in {dimension} run function {ns}:{name}'])
-        if short=='end':
-            write(f'data/{ns}/predicate/protected_center.json',json.dumps({
-                'type':'minecraft:location_check','predicate':{'position':{
-                    'x':{'min':-256,'max':255.999},'z':{'min':-256,'max':255.999}}}},indent=2))
-            # Never acquire generation tickets for the protected central square.
-            step_path=pack/f'data/{ns}/function/pregen/step.mcfunction'
-            step=step_path.read_text().splitlines()
-            emit('pregen/step',step[:3]+[f'function {ns}:pregen/step_at with storage {ns}:job cursor'])
-            emit('pregen/step_at',[
-                f'$execute positioned $(x) 0 $(z) if predicate {ns}:protected_center run return run function {ns}:pregen/protect with storage {ns}:job cursor',
-                *step[3:],
-            ])
-            emit('pregen/protect',[
-                f'$data modify storage {ns}:ledger regions."$(x),$(y),$(z)" set value "protected"',
-                f'function {ns}:pregen/advance',
-            ])
-            # Single-cube entry and direct run also preserve the center.
-            path=pack/f'data/{ns}/function/internal/run.mcfunction'
-            emit('internal/run',[
-                f'execute if predicate {ns}:protected_center run return 0',
-                *path.read_text().splitlines(),
-            ])
     # Existing commands follow the caller's dimension; explicit aliases work anywhere.
     for name in ('pause','resume','status'):
         original=selected[name].splitlines()

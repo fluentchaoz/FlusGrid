@@ -1,1 +1,1 @@
-tellraw @a {text:"FlusGrid 0.5.0: disposable Creative worlds only. /function flusgrid:pregen_2048_here prepares 2048x2048 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Nether/End: use dimension-specific prep commands.",color:"yellow"}
+tellraw @a {text:"FlusGrid 0.6: /function flusgrid:setup prepares all dimensions. Controls: realm_status, realm_pause, realm_resume. Automatic expansion holds players inside finished terrain when behind. /function flusgrid:archive stops it for archival import.",color:"yellow"}

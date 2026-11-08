@@ -1,3 +1,4 @@
+execute in minecraft:the_end run function flusgrid_end:arena/release
 scoreboard objectives add flusgrid dummy
 scoreboard players set #quiet flusgrid 0
 execute in minecraft:the_end run function flusgrid_end:pregen/release

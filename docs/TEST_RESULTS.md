@@ -1,5 +1,21 @@
 # Validation history
 
+## 0.6.0 campaign, End masks and frontier (2026-11-08)
+
+Actual vanilla Java26.3 / Zulu Java25.0.5.0.3, disposable headless seed887314. Final runtime loaded without function/registry errors. No Realms or graphical client session was performed.
+
+- Completed a real **144×144 central End region**, X/Z -64..79, Y0..255:81 chunks /1296 cubes. Offline saved-NBT audit checked every cube complete and no owned ticket. All10 crystal entities, all10 bedrock caps and obsidian immediately below survived. A podium gold fixture survived; an off-grid gold fixture outside the podium became air; a grid diamond fixture stayed. Assertions:0 failures.
+- Paused an in-progress protected cube at(16,48,-32), mask phase1; all arena/worker force-load tickets were released. Reload preserved the exact mask cursor and errors. Resume completed the entire region.
+- Development's first single-tick mask exceeded65536 commands. It was replaced with bounded multi-tick carve/verify phases and re-tested in a fresh disposable world. No command-limit errors appeared in the final runtime log. Arena initialization now requires exactly10 detected vanilla caps before editing.
+- Campaign sequence exercised Overworld→Nether→End→ready. **Backend jobs were deliberately shortened to single chunks for this state-machine test.** The generated full starts were inspected at runtime: Nether16384 chunks/262144 cubes; End65536 chunks/1048576 cubes. The full-size campaign was NOT completed.
+- Stage decorations waited for chunks; their temporary ticket storage was empty after completion. Portal assertions checked all12 empty inward-facing frames at Y-32, all9 interior air blocks and the obsidian footing:0 failures.
+- Frontier entity-level fixtures used marker entities calling the same position/planner/return functions, not connected players. Tested exact fractional safe-position return, request before the buffer boundary, unchanged finished bounds during pending work, and duplicate-request nonreplacement:0 failures. Manual pause retained the guard and survived reload; an unpaused controller-owned job resumed automatically after reload.
+- All12 dimension/direction rectangle plans checked in runtime, including negative coordinates, strip bounds and cube/chunk counts:0 failures. A real two-chunk rectangle finished with48 verified Overworld cubes; its controller committed the proposed frontier only on completion. **The job size was shortened for this completion-branch test; it does not establish a full512-wide strip run.**
+- Old0.5 `protected` cube migrated and converted successfully; an off-grid gold block added after completion survived a repeated conversion request. Assertions:0 failures. Archive set live=0 and paused work.
+- 17 Python unit tests pass, including exact masked grid complement, portal orientation/coordinates, preservation of failed/started/completed journals, and generated function references.
+
+Limits: no full25-hour setup, full live expansion strip, multi-client elytra/portal-latency test, real Realm load, full dragon fight or dragon respawn test. Marker fixtures do not test player-only tick selection, effect application or client movement prediction. Physics/progression remain experimental; generated pillar respawns can restore full pillars. Prior0.5 full512 Nether/End runs remain recorded below, but used the earlier central-island exclusion.
+
 ## 0.5.0 Nether and End isolation (2026-11-08)
 
 Tested on actual vanilla Java 26.3, Zulu Java 25.0.5.0.3, seed 887314, in a disposable headless server. Final pack loaded without function/predicate parsing errors. Initial development caught and fixed the 26.3 predicate `type` field requirement.

@@ -22,7 +22,7 @@ expected={f'{x},{y},{z}' for x in range(job['min_x'],job['max_x']+1,16)
 assert len(expected)==target*sections
 def wanted(k):
  x,y,z=map(int,k.split(','))
- return 'protected' if namespace=='flusgrid_end' and -256<=x<256 and -256<=z<256 else 'complete'
+ return 'protected' if '--v5-end-protection' in sys.argv and namespace=='flusgrid_end' and -256<=x<256 and -256<=z<256 else 'complete'
 bad=[k for k in expected if regions.get(k)!=wanted(k)]
 assert not bad, f'{len(bad)} missing/incomplete entries: {bad[:10]}'
 print(f'PASS: all {len(expected)} distinct cubes correctly accounted for; {target} chunks; no owned ticket remains.')

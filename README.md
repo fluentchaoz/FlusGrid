@@ -12,18 +12,15 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 
 ## Status
 
-**0.5.0 experimental preparation:** separate Overworld, Nether and End jobs, with 512×512 and 2048×2048 options. Existing Overworld progress is preserved. The End's central 512×512 dragon arena is excluded from conversion by default. Retained vanilla leaves remain persistent.
+**0.6.0 experimental one-map setup:** `/function flusgrid:setup` prepares Overworld, Nether, then a larger End. It places the empty End portal at (0,-32,0), preserves pylon tops and the central podium, and grids the rest of the End island. Automatic 512-wide expansion strips and a finished-area travel guard support continued exploration.
 
-Ryan completed his 2048×2048 Overworld on 0.4.0. Other block physics, survival progression and Realms validation remain unfinished. See test results for the exact developer validation scope.
+**This is not an unlimited-flight or production-Realms guarantee.** Fast players can reach the guard before preparation finishes. Full-size end-to-end setup, Realm load and survival/dragon progression still require a playtest. Existing leaf persistence remains; other block physics are not frozen.
 
-- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.5.0-experimental.zip)
-- [Upgrade and prepare Nether / End](docs/DIMENSIONS.md)
-- [Install and prepare 2,048×2,048](docs/PREP_2048.md)
-- [Earlier 512×512 workflow](docs/PREGEN.md)
-- [Earlier 48×48 test](docs/TESTING.md)
+- [Download 0.6.0](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.6.0-experimental.zip)
+- [One-map setup, exact commands and limits](docs/REALMS_SETUP.md)
 - [Test results](docs/TEST_RESULTS.md)
-- [Design plan](docs/DESIGN.md)
 - [Development handoff](docs/HANDOFF.md)
+- [Earlier standalone dimension commands (0.5 history)](docs/DIMENSIONS.md)
 
 ## Intended play workflow
 

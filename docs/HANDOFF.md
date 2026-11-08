@@ -8,7 +8,21 @@ Ryan wants a fresh RaysGrid-inspired Java 26.3 world, ultimately playable on Jav
 
 He successfully tested 0.1.0's stone grid and 0.2.0's actual full-height terrain grid. He proposed preparing terrain hundreds of blocks ahead to hide conversion. We agreed to bounded local pregeneration before Realms rather than promising live exploration performance. The next delivered milestone is a 512×512 preparation job.
 
-## Current build: 0.5.0 — isolated dimension preparation
+## Current build: 0.6.0 — one-map controller and guarded frontier
+
+User now wants one pack that prepares Overworld, Nether and End in order, then starts large remote swaths as players approach. End should be gridded except pylon tops and exit/dragon podium. Add empty End portal centered at Overworld (0,-32,0), keeping the previous requirement to fill twelve Eyes.
+
+`tools/realms.py` generates controller, rectangular jobs, player frontier checks, stage decorations and End masks. `/function flusgrid:setup` starts 2048 Overworld, 2048 Nether, 4096 End centered at zero. Exact matching completed centered Overworld/Nether jobs are adopted without redoing them. Other completed cubes skip. Stage structures wait for their own chunks and release only owned tickets. Existing legacy jobs must not be running/paused at setup entry.
+
+One automatic expansion globally: a player within768 blocks of a finished boundary requests a512-wide strip spanning the edge. Boundaries commit only after full completion. Survival/Adventure guard holds players512 blocks inside finished terrain, returning them to per-player/per-dimension-safe coordinates or a fallback platform. Creative/Spectator bypass. Guard remains active while preparation is paused. This DOES NOT guarantee seamless unlimited elytra flight; expansion can take hours. Do not conceal this limit.
+
+Normal ticks keep one cube per tick. End central/arrival cubes use a durable mask cursor: init, four carve phases, four verify phases, finish. The original single-tick mask exceeded65536 commands in runtime; final split worker stays under the tested budget. Journal errors lock a cube. Load/pause releases arena tickets; resume reacquires and reconstructs marker caps before continuing the saved phase. End cap detection scans actual bedrock heights at vanilla spike centers with rounding tolerance, preserving13×11×13 neighborhoods (selector boundary details), a17×17 podium column and arrival area. First-fight geometry tested; actual fight/respawn not certified. Vanilla respawn can regenerate pillars. Outside these areas, End structures/gateways are gridded too.
+
+Saved state: `flusgrid:realm` controller, per-dimension original jobs/ledgers, `flusgrid:fixtures` temporary owned stage tickets, `flusgrid_end:arena` owned central tickets/ready flag. New player scoreboards `fg_x/y/z`, `fg_sx/sy/sz`, `fg_sd`. `flusgrid_cap` markers identify caps. No random-tick shutdown, custom worldgen or plugin dependencies. Physics limitations remain.
+
+Use `docs/REALMS_SETUP.md` as current player instructions. Current build: `dist/FlusGrid-0.6.0-experimental.zip`. Historical dimension instructions describe different End protection. Read TEST_RESULTS for exact runtime scope; never claim the entire25-hour setup or Realms session ran here. `/function flusgrid:archive` pauses/releases and disables the player guard for eventual Flunkstar import.
+
+## Previous build: 0.5.0 — isolated dimension preparation
 
 Ryan reports completing the 2048×2048 Overworld in about six hours on 0.4.0. Preserve that world and its original `flusgrid` storage. Nether and End use `flusgrid_nether` / `flusgrid_end` namespaces for jobs, work and ledgers. `tools/dimensions.py` generates these workers from the Overworld template before context-dispatch controls are appended. Shared scoreboard scratch is used only synchronously within a tick/function. All three dimension workers have tick handlers; recommend one job at a time.
 

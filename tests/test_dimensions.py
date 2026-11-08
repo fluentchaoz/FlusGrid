@@ -17,21 +17,25 @@ class Dimensions(unittest.TestCase):
    s=(root/'pregen/advance.mcfunction').read_text()
    self.assertIn('matches ..-16',s)
    self.assertEqual(len(range(240,-1,-16)),16)
- def test_end_guard_at_both_entry_paths(self):
+ def test_end_protection_requires_initialized_arena(self):
   r=P/'data/flusgrid_end/function'
-  self.assertIn('protected_center',(r/'pregen/step_at.mcfunction').read_text().splitlines()[0])
-  self.assertIn('protected_center',(r/'internal/run.mcfunction').read_text().splitlines()[0])
+  self.assertIn('arena/tick',(r/'pregen/step.mcfunction').read_text())
+  self.assertIn('arena {ready:1b}',(r/'internal/run.mcfunction').read_text())
+  self.assertFalse((P/'data/flusgrid_end/predicate/protected_center.json').exists())
  def test_end_predicate_format_and_bounds(self):
-  p=json.loads((P/'data/flusgrid_end/predicate/protected_center.json').read_text())
+  p=json.loads((P/'data/flusgrid_end/predicate/podium.json').read_text())
   self.assertEqual(p['type'],'minecraft:location_check')
   for axis in ('x','z'):
-   self.assertEqual(p['predicate']['position'][axis],{'min':-256,'max':255.999})
+   self.assertEqual(p['predicate']['position'][axis],{'min':-8,'max':8.999})
  def test_load_and_tick_include_all_dimensions(self):
   for kind in ('load','tick'):
    v=json.loads((P/f'data/minecraft/tags/function/{kind}.json').read_text())['values']
-   self.assertEqual(len(v),3)
+   self.assertEqual(len(v),4)
+   self.assertEqual(v[-1],'flusgrid:realm/'+kind)
  def test_function_targets_exist(self):
   for p in P.glob('data/*/function/**/*.mcfunction'):
    for ns,name in re.findall(r'\bfunction (flusgrid(?:_nether|_end)?):([a-z0-9_/]+)',p.read_text()):
-    self.assertTrue((P/f'data/{ns}/function/{name}.mcfunction').exists(),(p,ns,name))
+    if name=='mask/phase_':
+     for phase in range(9):self.assertTrue((P/f'data/{ns}/function/{name}{phase}.mcfunction').exists())
+    else:self.assertTrue((P/f'data/{ns}/function/{name}.mcfunction').exists(),(p,ns,name))
 if __name__=='__main__':unittest.main()

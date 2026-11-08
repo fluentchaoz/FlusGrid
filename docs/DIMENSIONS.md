@@ -1,3 +1,5 @@
+> Historical 0.5 workflow. For 0.6 use [One-map setup](REALMS_SETUP.md); the End protection changed.
+
 # Nether and End preparation — 0.5.0
 
 Keep your completed Overworld. This update adds separate Nether and End jobs and ledgers; installing it does not start conversion or reset Overworld progress.
