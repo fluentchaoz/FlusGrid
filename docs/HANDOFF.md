@@ -2,6 +2,33 @@
 
 Updated: 2026-11-08
 
+## Queued regions failing to start — fixed and runtime-confirmed (2026-11-08)
+
+Ryan's screenshot showed controller {state:"ready",phase:"complete",live:1b,
+model:10000,manual_pause:0b}, several queued Overworld tiles, and no
+active owner. In Creative, tiles were indeed being REQUESTED, but never
+started. Creative no-teleport behavior is intentional.
+
+Two independent invalid vanilla command forms were fixed in tools/tenk.py:
+- Tile dispatch used the invalid syntax "execute if data storage
+  flusgrid:realm queue[0] {dimension:...}". Instead, copy queue[0] into
+  the temporary dispatch compound and use a valid root NBT predicate
+  against dispatch.dimension.
+- Tile workers tried "data merge storage flusgrid:realm rectangle {...}".
+  Vanilla data merge accepts an NBT compound for the full storage; the
+  correct command is "data merge storage flusgrid:realm {rectangle:{...}}".
+
+Python tests did not detect the second issue. A new
+tests/run_10k_runtime.py launches actual vanilla Java 26.3 on GitHub
+Actions (Java 25), loads the generated ZIP, enqueues an Overworld tile,
+invokes the dispatch function, and asserts owner=overworld,
+plan=(overworld,0,0), state=running, chunk_total=1024, and the queue head
+consumed. **Vanilla runtime PASSED** on 2026-11-08 (Actions run
+42513222035). This is not a real connected-player or full conversion
+test, so the user must still validate Creative traversal and progress
+in the actual world after replacing the ZIP and reloading. Do not
+restart initial setup or erase queued tiles; this fix consumes them.
+
 ## 0.7 experimental feature branch — 10K and automatic remote tiles (2026-11-08)
 
 Git branch: feature/10k-regions; draft PR #1. Built ZIP:
