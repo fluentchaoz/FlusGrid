@@ -59,6 +59,19 @@ class TenK(unittest.TestCase):
         self.assertIn("minecraft:air",safe)
         self.assertNotIn("#flusgrid:safe_floor",safe)
 
+    def test_queued_tile_dispatch_uses_valid_root_nbt_predicate(self):
+        dispatch = self.load("tile_start")
+        self.assertIn("dispatch set from storage flusgrid:realm queue[0]", dispatch)
+        for dim in ("overworld", "nether", "end"):
+            self.assertIn(
+                '{dispatch:{dimension:"' + dim + '"}} run function flusgrid:realm/tile_start_' + dim,
+                dispatch,
+            )
+            self.assertNotIn('queue[0] {dimension:"' + dim + '"}', dispatch)
+        self.assertIn("data remove storage flusgrid:realm dispatch",dispatch)
+        tick = self.load("tick")
+        self.assertIn("run function flusgrid:realm/tile_start with storage flusgrid:realm queue[0]", tick)
+
     def test_creative_requests_regions_without_teleport(self):
         players = self.load("players10")
         self.assertNotIn("gamemode=!creative", players)
