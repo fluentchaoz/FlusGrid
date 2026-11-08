@@ -1,5 +1,19 @@
 # FlusGrid
 
+## Experimental 0.7 — 10K regions (feature branch)
+
+This branch adds a 10,000 × 10,000-block starting square in all three dimensions,
+automatic queued 512 × 512 remote tiles, and checkpoint-based portal return without
+a manual player command. Source: tools/tenk.py. The initial job is extraordinarily
+large (over 12 days theoretical minimum at normal tick speed).
+
+- [0.7 experimental ZIP](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/feature/10k-regions/dist/FlusGrid-0.7.0-10k-experimental.zip)
+- [10K model, testing caveats and operator instructions](docs/TENK_MODEL.md)
+- [0.7 build checks](https://github.com/fluentchaoz/FlusGrid/actions/workflows/tenk.yml)
+
+**Not Realms-certified.** This is a development preview. The 0.6 section below
+describes the main-branch release and remains unchanged.
+
 A RaysGrid-inspired Minecraft Java survival project: keep naturally generated blocks at regular grid positions, preserving their relationship to the original terrain rather than randomizing block types.
 
 ## Confirmed target
