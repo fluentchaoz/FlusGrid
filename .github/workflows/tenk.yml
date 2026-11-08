@@ -1,0 +1,41 @@
+name: Build and test FlusGrid 10K experimental
+
+on:
+  push:
+    branches:
+      - feature/10k-regions
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate experimental 10K datapack
+        run: python tools/build.py
+      - name: Regenerate independent portal-test fixture
+        run: python tools/build_portal_test.py
+      - name: Run all Python contract tests
+        run: python -m unittest discover -s tests -v
+      - name: Upload experimental ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlusGrid-0.7.0-10k-experimental
+          path: dist/FlusGrid-0.7.0-10k-experimental.zip
+      - name: Commit generated datapack and experimental ZIP to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add datapack dist/FlusGrid-0.7.0-10k-experimental.zip
+          if ! git diff --cached --quiet; then
+            git commit -m "Build validated 0.7 experimental 10K datapack"
+            git push origin HEAD:feature/10k-regions
+          fi
