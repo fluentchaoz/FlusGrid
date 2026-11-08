@@ -129,7 +129,10 @@ def build_10k(pack, write, function):
         ]],
     ])
     # A single queue, persistent across save/reload, with per-dimension dedupe.
-    f('tile_start', ['$function flusgrid:realm/tile_start_$(dimension) with storage flusgrid:realm queue[0]'])
+    f('tile_start', [
+        f'execute if data storage {S} queue[0] {{dimension:"{short}"}} run function flusgrid:realm/tile_start_{short} with storage {S} queue[0]'
+        for short, ns, dim, top, low, sections in DIMS
+    ])
     for short,ns,dim,top,low,sections in DIMS:
         idx=DIM_INDEX[short]
         f('tile_lookup_'+short,[
