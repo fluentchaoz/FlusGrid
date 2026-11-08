@@ -15,6 +15,7 @@ execute if score #inside flusgrid matches 0 run function flusgrid:realm/tile_loo
 execute if score #inside flusgrid matches 0 run function flusgrid:realm/request_here_nether
 execute if score #inside flusgrid matches 1 if score #main flusgrid matches 1 run function flusgrid:realm/request_main_nether
 execute if score #inside flusgrid matches 1 if score #main flusgrid matches 0 run function flusgrid:realm/request_neighbors_nether
+execute if entity @s[gamemode=creative] run return 1
 execute if score #inside flusgrid matches 0 run return run function flusgrid:realm/hold10_nether
 function flusgrid:realm/checkpoint_safe
 execute if score #safe flusgrid matches 1 if entity @s[nbt={OnGround:1b}] run function flusgrid:realm/checkpoint
