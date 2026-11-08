@@ -97,7 +97,7 @@ def build_10k(pack, write, function):
         f'execute if data storage {S} {{state:"ready",live:1b,model:10000}} unless data storage {S} owner if data storage {S} queue[0] run function flusgrid:realm/tile_start with storage flusgrid:realm queue[0]',
     ])
     f('players10', [
-        *[f'execute as @a[gamemode=!creative,gamemode=!spectator] at @s if dimension {dim} run function flusgrid:realm/player10_{short}'
+        *[f'execute as @a[gamemode=!spectator] at @s if dimension {dim} run function flusgrid:realm/player10_{short}'
           for short,ns,dim,top,low,sections in DIMS],
     ])
     # No particular standing block is required: save only when the
@@ -137,6 +137,7 @@ def build_10k(pack, write, function):
             f'scoreboard players operation #tile_{a} flusgrid = @s fg_{a}',
             f'scoreboard players operation #mod flusgrid = #tile_{a} flusgrid',
             'scoreboard players operation #mod flusgrid %= #tile_size flusgrid',
+            'execute if score #mod flusgrid matches ..-1 run scoreboard players add #mod flusgrid 512',
             f'scoreboard players operation #tile_{a} flusgrid -= #mod flusgrid',
             f'execute store result storage {S} scratch.tile.{a} int 1 run scoreboard players get #tile_{a} flusgrid',
         ]],
@@ -146,6 +147,7 @@ def build_10k(pack, write, function):
             f'scoreboard players operation #r{a} flusgrid = #target_{a} flusgrid',
             f'scoreboard players operation #mod flusgrid = #r{a} flusgrid',
             'scoreboard players operation #mod flusgrid %= #tile_size flusgrid',
+            'execute if score #mod flusgrid matches ..-1 run scoreboard players add #mod flusgrid 512',
             f'scoreboard players operation #r{a} flusgrid -= #mod flusgrid',
             f'execute unless score #r{a} flusgrid matches -29999984..29999472 run return 0',
             f'execute store result storage {S} scratch.request.{a} int 1 run scoreboard players get #r{a} flusgrid',
@@ -187,6 +189,7 @@ def build_10k(pack, write, function):
             f'execute if score #inside flusgrid matches 0 run function flusgrid:realm/request_here_{short}',
             f'execute if score #inside flusgrid matches 1 if score #main flusgrid matches 1 run function flusgrid:realm/request_main_{short}',
             f'execute if score #inside flusgrid matches 1 if score #main flusgrid matches 0 run function flusgrid:realm/request_neighbors_{short}',
+            'execute if entity @s[gamemode=creative] run return 1',
             f'execute if score #inside flusgrid matches 0 run return run function flusgrid:realm/hold10_{short}',
             'function flusgrid:realm/checkpoint_safe',
             'execute if score #safe flusgrid matches 1 if entity @s[nbt={OnGround:1b}] run function flusgrid:realm/checkpoint',
