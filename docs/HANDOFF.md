@@ -1,6 +1,6 @@
 # Development handoff
 
-Updated: 2026-11-07
+Updated: 2026-11-08
 
 ## Scope and user feedback
 
@@ -8,7 +8,17 @@ Ryan wants a fresh RaysGrid-inspired Java 26.3 world, ultimately playable on Jav
 
 He successfully tested 0.1.0's stone grid and 0.2.0's actual full-height terrain grid. He proposed preparing terrain hundreds of blocks ahead to hide conversion. We agreed to bounded local pregeneration before Realms rather than promising live exploration performance. The next delivered milestone is a 512×512 preparation job.
 
-## Current build: 0.4.0 — large prep and persistent leaves
+## Current build: 0.5.0 — isolated dimension preparation
+
+Ryan reports completing the 2048×2048 Overworld in about six hours on 0.4.0. Preserve that world and its original `flusgrid` storage. Nether and End use `flusgrid_nether` / `flusgrid_end` namespaces for jobs, work and ledgers. `tools/dimensions.py` generates these workers from the Overworld template before context-dispatch controls are appended. Shared scoreboard scratch is used only synchronously within a tick/function. All three dimension workers have tick handlers; recommend one job at a time.
+
+Both new dimensions process Y 0–255 (16 cubes/chunk). Their 2048 jobs have 262,144 cubes, 16,384 chunks. The End excludes the central X/Z [-256,255] square before force-load acquisition, recording protected entries and advancing progress. Single-cube conversion also checks the guard. In 26.3 predicate JSON uses `type`, not the older `condition` field; the runtime caught this during development.
+
+Public commands and upgrade steps are in `docs/DIMENSIONS.md`; current ZIP is 0.5.0. Dimension-specific status/pause/resume work from anywhere, while generic controls follow the caller's dimension. Explicit start APIs must execute in the intended dimension. No automatic conversion begins on installation. No changes to physics beyond existing leaf persistence, no portal safety system, no automatic border, and no End-city preservation. Central arena preservation is not a gameplay certification of the dragon fight.
+
+See TEST_RESULTS.md for runtime coverage. Do not describe any full 2048 Nether/End run as completed unless newly verified.
+
+## Previous build: 0.4.0 — large prep and persistent leaves
 
 Ryan requested 2048×2048 prep code so he could start preparing while further development proceeds, and specifically asked to prevent leaves/other normal deterioration. This build adds `pregen_2048_here` and explicit `pregen_2048_start {x,z}` minimum-corner API. Size-specific start functions share a worker using job.total/chunk_total rather than hardcoded 512 counts. Old 512 commands remain unchanged; load migrates missing size/chunk_total on old pregen jobs. 2048 means 16,384 chunks / 393,216 cubes, at least 5h41m20s at normal tick rate before lag/waits. No optimization, ETA, border or new survival setup in this build.
 
@@ -16,7 +26,7 @@ Leaf persistence is applied BEFORE removal, only to retained grid positions. `to
 
 Do not say all physics are frozen: fluids, falling blocks, grass/farmland and unsupported plants remain unresolved. No global random-tick rule is changed by the pack. Persistent leaves can still be mined/burned/exploded. Custom species outside vanilla are unsupported.
 
-The current guide is `docs/PREP_2048.md`; current ZIP is 0.4.0. Test details belong in TEST_RESULTS.md. A complete 2048 run is NOT yet validated/timed. The user's requested extra stability work needs further investigation; don't imply it happens asynchronously after a response.
+The Overworld guide is `docs/PREP_2048.md`; 0.4.0 was the first large-prep ZIP. Test details belong in TEST_RESULTS.md. A complete 2048 run is NOT yet validated/timed. The user's requested extra stability work needs further investigation; don't imply it happens asynchronously after a response.
 
 ## Previous build: 0.3.0 experimental pregen
 
@@ -39,15 +49,15 @@ Scoreboard `flusgrid` and `flusgrid:work` are scratch state. Job and ledger are 
 ## Files and validation
 
 - `tools/build.py`, `tools/area.py`, `tools/pregen.py`: standard-library generators.
-- `datapack/`: generated files; `dist/FlusGrid-0.3.0-experimental.zip`: current build. Keep only this ZIP installed; older ZIPs are historical downloads.
+- `datapack/`: generated files; `dist/FlusGrid-0.5.0-experimental.zip`: current build. Keep only this ZIP installed; older ZIPs are historical downloads.
 - `docs/PREGEN.md`: current player instructions; `docs/TESTING.md`: earlier area demonstration.
 - `docs/TEST_RESULTS.md`: runtime results and limits.
-- `tests/audit_pregen_save.py`: optional offline audit of all 24,576 ledger entries; needs nbtlib. 26.3 storage path is world/data/flusgrid/command_storage.dat.
+- `tests/audit_pregen_save.py`: optional offline audit of all expected ledger entries for the selected dimension; needs nbtlib. 26.3 storage path is world/data/flusgrid/command_storage.dat.
 
 Review the recorded test results before making claims. Headless runtime tests use a separate disposable vanilla 26.3 server with Java 25. Accelerated tick rate is for development testing only; it is not normal-speed performance or a Realm test. The player wrapper is parsed but not tested through a graphical connected player here.
 
 ## Next work
 
-Inspect Ryan's prepared square and address fluid flow, leaf decay, falling blocks, scheduled ticks and boundary inflow. Strict editing is not permanent physics suppression. Then decide progression exceptions, spawning, borders/expansion and dimensions before attempting Realms survival.
+Inspect Ryan's prepared square and address fluid flow, leaf decay, falling blocks, scheduled ticks and boundary inflow. Strict editing is not permanent physics suppression. Then decide progression exceptions, spawning, borders/expansion and portal travel limits before attempting Realms survival.
 
 Beyond the square, ordinary terrain remains. No automatic exploration extension or world border is installed. This is not a full survival pack or certified Realms compatibility. Preserve the saved ledger when importing, and pause before removing/disabling the pack so its ticket is released.

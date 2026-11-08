@@ -1,1 +1,1 @@
-{"values": ["flusgrid:area/tick"]}
+{"values": ["flusgrid:area/tick", "flusgrid_nether:pregen/tick", "flusgrid_end:pregen/tick"]}

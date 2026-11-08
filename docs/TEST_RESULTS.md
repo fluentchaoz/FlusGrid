@@ -1,5 +1,20 @@
 # Validation history
 
+## 0.5.0 Nether and End isolation (2026-11-08)
+
+Tested on actual vanilla Java 26.3, Zulu Java 25.0.5.0.3, seed 887314, in a disposable headless server. Final pack loaded without function/predicate parsing errors. Initial development caught and fixed the 26.3 predicate `type` field requirement.
+
+- Same-coordinate fixtures in all three dimensions: all 4,096 block positions per cube checked. Nether and End became their respective grids; the completed Overworld emerald cube remained wholly untouched. Separate ledger entries verified. Completion sentinel 1, failures 0. Read-only recheck after the bulk jobs also passed.
+- End central gold sentinel survived direct conversion. Predicate boundaries -256 and 255 included, -257 and 256 excluded.
+- Both 2048 entrypoints created correct 262,144-cube / 16,384-chunk jobs. Nether processed 938 cubes (58 whole chunks plus 10 cubes); End processed 1,376 cubes (86 chunks) before explicit pause. Reload preserved cursors/counts, paused both jobs and released owned tickets. Resume advanced both; manual pause released tickets again. Full 2048 runs were NOT performed.
+- After pausing, only in the disposable test save, those partial 2048 jobs were marked complete to permit fresh 512 jobs. Their saved completed cubes remained and were skipped where overlapping.
+- **Complete 512×512 jobs finished in both Nether and outer End** at X/Z 4096..4607, Y 0..255. Each reached 1,024 chunks, 16,384 cubes, 100%, state complete, with no owned ticket. After `save-all flush`, offline NBT audits checked every expected cube key in each dimension: all complete. Both workers ran simultaneously, exercising shared synchronous scoreboard scratch.
+- Pre-existing force-load tickets remained: one Nether fixture ticket, two End fixture tickets. No job-owned tickets remained after completion.
+- Central End pregen processed 20 protected cubes without acquiring any new ticket. A separately injected final cursor/count tested the last protected-cube completion branch; this was NOT a full central-square run.
+- Twelve Python unit tests pass. ZIP contents match generated files exactly.
+
+Bulk testing used target tick rate 200 and produced overload warnings; this is not a normal-speed benchmark. The pack never changes tick speed. No graphical player-wrapper test, full 2048 Nether/End completion, Realm test, dragon fight or survival-progression validation is claimed. The Overworld fixture demonstrates dimension isolation, not a complete real-world upgrade simulation. Ryan separately reports his 0.4.0 Overworld 2048 preparation completed in about six hours.
+
 ## 0.4.0 leaves and 2048 entrypoint (2026-11-07)
 
 Tested against actual vanilla Java 26.3 / Java 25. The leaf list was extracted from the server's shipped block/leaves tag, not guessed.

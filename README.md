@@ -12,11 +12,12 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 
 ## Status
 
-**0.4.0 experimental preparation:** `/function flusgrid:pregen_2048_here` prepares a 2,048×2,048-block square through full height. The older `pregen_here` remains 512×512. Retained vanilla leaves are now explicitly persistent to prevent normal decay, preserving their species and waterlogging.
+**0.5.0 experimental preparation:** separate Overworld, Nether and End jobs, with 512×512 and 2048×2048 options. Existing Overworld progress is preserved. The End's central 512×512 dragon arena is excluded from conversion by default. Retained vanilla leaves remain persistent.
 
-The full 512 run was tested; the new 2048 job has startup, partial-processing and boundary tests, not an end-to-end completion benchmark. Other block physics and survival progression remain unfinished.
+Ryan completed his 2048×2048 Overworld on 0.4.0. Other block physics, survival progression and Realms validation remain unfinished. See test results for the exact developer validation scope.
 
-- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.4.0-experimental.zip)
+- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.5.0-experimental.zip)
+- [Upgrade and prepare Nether / End](docs/DIMENSIONS.md)
 - [Install and prepare 2,048×2,048](docs/PREP_2048.md)
 - [Earlier 512×512 workflow](docs/PREGEN.md)
 - [Earlier 48×48 test](docs/TESTING.md)
