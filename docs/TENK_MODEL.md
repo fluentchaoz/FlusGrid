@@ -92,8 +92,9 @@ At each game tick, players are checked against the initial 10K square
 and completed remote tiles. Players who enter unfinished terrain trigger
 a tile request and are returned to their last *recorded safe approach*
 instead of being sent to world spawn. The checkpoint is updated
-automatically while they stand on an allowed full block, with a 3×3
-clearance and no nearby portal. It retains dimension, position and
+automatically while the player is grounded, with a 3×3 clear
+approach, no nearby portal and exclusion of hazardous or air floors.
+No particular stone/obsidian/plank block is required. It retains dimension, position and
 rotation. Rejected Nether cross-dimension arrivals can return to their
 Overworld checkpoint, or the reverse, **after the vanilla portal transfer
 has occurred**. A title explains that the destination is not ready.
