@@ -1,5 +1,21 @@
 scoreboard players set #safe flusgrid 1
-execute unless block ~ ~-1 ~ #flusgrid:safe_floor run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:air run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:cave_air run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:void_air run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:water run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:lava run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:fire run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:soul_fire run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:powder_snow run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:cactus run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:magma_block run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:campfire run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:soul_campfire run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:cobweb run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:sweet_berry_bush run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:pointed_dripstone run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:scaffolding run scoreboard players set #safe flusgrid 0
+execute if block ~ ~-1 ~ minecraft:bubble_column run scoreboard players set #safe flusgrid 0
 execute unless block ~-1 ~0 ~-1 minecraft:air run scoreboard players set #safe flusgrid 0
 execute unless block ~-1 ~1 ~-1 minecraft:air run scoreboard players set #safe flusgrid 0
 execute unless block ~-1 ~0 ~0 minecraft:air run scoreboard players set #safe flusgrid 0

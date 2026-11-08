@@ -17,4 +17,4 @@ execute if score #inside flusgrid matches 1 if score #main flusgrid matches 1 ru
 execute if score #inside flusgrid matches 1 if score #main flusgrid matches 0 run function flusgrid:realm/request_neighbors_overworld
 execute if score #inside flusgrid matches 0 run return run function flusgrid:realm/hold10_overworld
 function flusgrid:realm/checkpoint_safe
-execute if score #safe flusgrid matches 1 run function flusgrid:realm/checkpoint
+execute if score #safe flusgrid matches 1 if entity @s[nbt={OnGround:1b}] run function flusgrid:realm/checkpoint
