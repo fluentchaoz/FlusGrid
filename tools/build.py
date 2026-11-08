@@ -31,7 +31,7 @@ def boxes():
 def build():
     # Generated resources must not retain obsolete functions across versions.
     if PACK.exists(): shutil.rmtree(PACK)
-    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.6.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
+    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.7.0 — 10K experimental campaign', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
     write('data/minecraft/tags/function/load.json', json.dumps({'values':['flusgrid:load']}))
     function('load', [
         'scoreboard objectives add flusgrid dummy',
@@ -98,7 +98,9 @@ def build():
     build_dimensions(PACK, write, function)
     from realms import build_realms
     build_realms(PACK, write, function)
-    out = ROOT / 'dist' / 'FlusGrid-0.6.0-experimental.zip'
+    from tenk import build_10k
+    build_10k(PACK, write, function)
+    out = ROOT / 'dist' / 'FlusGrid-0.7.0-10k-experimental.zip'
     out.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         for p in sorted(PACK.rglob('*')):
