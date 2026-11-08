@@ -1,1 +1,1 @@
-tellraw @a {text:"FlusGrid 0.6: /function flusgrid:setup prepares all dimensions. Controls: realm_status, realm_pause, realm_resume. Automatic expansion holds players inside finished terrain when behind. /function flusgrid:archive stops it for archival import.",color:"yellow"}
+tellraw @a {text:"FlusGrid 0.7 experimental: setup prepares 10K x 10K in every dimension; beyond that, queued 512x512 tiles are gridded automatically. Use realm_status, realm_pause, realm_resume; archive before importing to Flunkstar.",color:"yellow"}

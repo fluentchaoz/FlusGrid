@@ -13,3 +13,9 @@ execute in minecraft:overworld run function flusgrid:realm/fixture_release_overw
 execute in minecraft:the_nether run function flusgrid:realm/fixture_release_nether
 execute in minecraft:the_end run function flusgrid:realm/fixture_release_end
 execute unless data storage flusgrid:realm {manual_pause:1b} run function flusgrid:realm/resume_owned
+scoreboard objectives add fg_yaw dummy
+scoreboard objectives add fg_pitch dummy
+scoreboard players set #tile_size flusgrid 512
+execute unless data storage flusgrid:realm tiles run data modify storage flusgrid:realm tiles set value {overworld:{},nether:{},end:{}}
+execute unless data storage flusgrid:realm pending run data modify storage flusgrid:realm pending set value {overworld:{},nether:{},end:{}}
+execute unless data storage flusgrid:realm queue run data modify storage flusgrid:realm queue set value []
