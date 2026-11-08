@@ -24,6 +24,8 @@ def build_10k(pack, write, function):
 
     # Keep 0.6's guard available for saves that have not opted into the new model.
     f('tick_legacy_players', read('players'))
+    for legacy_short, _, _, _, _, _ in DIMS:
+        f('legacy_complete_' + legacy_short, read('complete_' + legacy_short))
     f('load', read('load') + [
         'scoreboard objectives add fg_yaw dummy',
         'scoreboard objectives add fg_pitch dummy',
@@ -71,6 +73,8 @@ def build_10k(pack, write, function):
         f'execute if data storage {S} {{state:"ready",live:1b}} unless data storage {S} {{model:10000}} run function flusgrid:realm/tick_legacy_players',
         f'execute if data storage {S} {{manual_pause:1b}} run return 0',
         *[f'execute if data storage {S} {{state:"preparing",model:10000,phase:"{short}"}} if data storage {ns}:job {{state:"complete"}} run return run function flusgrid:realm/complete_{short}'
+          for short,ns,dim,top,low,sections in DIMS],
+        *[f'execute if data storage {S} {{state:"preparing",phase:"{short}"}} unless data storage {S} {{model:10000}} if data storage {ns}:job {{state:"complete"}} run return run function flusgrid:realm/legacy_complete_{short}'
           for short,ns,dim,top,low,sections in DIMS],
         *[f'execute if data storage {S} {{state:"ready",model:10000,owner:"{short}"}} if data storage {ns}:job {{state:"complete"}} run return run function flusgrid:realm/tile_complete_{short}'
           for short,ns,dim,top,low,sections in DIMS],
