@@ -1,5 +1,16 @@
 # Validation history
 
+## 0.7 experimental 10K generator (2026-11-08)
+
+The feature/10k-regions branch generates the 0.7 ZIP in GitHub Actions
+and passes the repository's 26 Python unit-contract tests, including
+10K and smoke initial bounds, per-dimension 512 tile totals, persistent
+queue, readiness gated on complete worker, automatic hold checkpoint,
+and no explicit spawn fallback. GitHub build does not constitute
+a loaded Java 26.3 world test. Full 10K preparation, fast smoke campaign,
+portal crossings with a real client, multi-player isolation, and Realms
+have **not** been verified. Do not merge as Realms-certified.
+
 ## Standalone portal-return test 0.1 (2026-11-08)
 
 Separate `FlusGrid-portal-return-test-0.1.zip`; production 0.6 unchanged. Vanilla Java 26.3 / Java25, seed887314, local headless server. Pack loaded with no function/registry errors. Five new static tests pass; the shipping test ZIP has no terrain-edit or force-load commands and no calls into FlusGrid conversion.

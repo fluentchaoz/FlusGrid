@@ -2,6 +2,49 @@
 
 Updated: 2026-11-08
 
+## 0.7 experimental feature branch — 10K and automatic remote tiles (2026-11-08)
+
+Git branch: feature/10k-regions; draft PR #1. Built ZIP:
+dist/FlusGrid-0.7.0-10k-experimental.zip. Main is still 0.6.
+The new tools/tenk.py generator runs after tools/realms.py via tools/build.py.
+The GitHub Actions workflow builds the ZIP, runs unittest and commits
+generated datapack resources to the feature branch only.
+
+Production setup is a centered 10,000×10,000 square per dimension:
+X/Z -5008..4991, total 21,875,000 full-height cubes. At 20 TPS the
+theoretical lower bound is about 12.66 active days. Small smoke test:
+new world, /function flusgrid:setup_smoke, 256×256 each dimension
+(-128..127), then the identical queued 512×512 remote-tile logic.
+
+On-demand design: 64-entry deduplicated persistent queue, one global
+rectangle job, ready-tile map per dimension, only commit usable status
+after complete worker. Ordinary player ticks automatically queue a
+tile for unsafe arrivals and nearby unconverted edges. The hold guard
+sends the player to their last recorded safe approach, in its source
+dimension when appropriate; it does not intentionally return them to
+world spawn. Any grounded terrain can make a checkpoint provided 3×3
+clearance, no nearby portal and no hazardous floor. Checkpoint/source
+validation can still fail if source is unloaded or changed; in that case
+a red diagnostic is shown and no fake fallback is attempted. This is
+NOT yet a guarantee against entering ungridded terrain.
+
+**Creative feedback change:** Players in Creative now enter the same
+automatic tile-request scan as Survival/Adventure but return from the
+handler before the teleport guard; they keep flying/walking into unprepared
+areas while generation queues in the background. Spectator alone remains
+excluded from the scan. Negative X/Z tile targeting also now uses
+nonnegative modulo before alignment (Minecraft scoreboard remainder is
+negative for negative inputs). Regression contracts check both behaviors.
+
+
+**Remaining before promoting to main:** actual Java 26.3 player
+test of setup_smoke; check the first unprepared Nether portal crossing,
+message, accurate return point, automatic queued job, and accepting a
+repeat crossing after tile completion. Test at least two players,
+disconnect/reconnect, mounted transit and fast movement. A vanilla
+headless/Realm run has NOT been done for 0.7. Read docs/TENK_MODEL.md
+and do not tell players the pack is fully production ready.
+
 ## Scope and user feedback
 
 Ryan wants a fresh RaysGrid-inspired Java 26.3 world, ultimately playable on Java Realms and archived in Flunkstar afterward. Vanilla datapack, no client mod/server plugin substitution without discussion.
