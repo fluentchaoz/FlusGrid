@@ -41,6 +41,34 @@ dimension jobs must finish before setup starts. The 0.6 legacy controller
 remains supported if you never invoke this 0.7 setup on that save; this
 version does **not** migrate a partially prepared 0.6 campaign to 10K.
 
+## Fast smoke test before attempting 10K
+
+The exact same queue, player guard and return code can be exercised in a
+**new disposable world** with a 256 × 256 initial square per dimension
+(X/Z -128..127). This test mode is deliberately smaller so the campaign
+can complete in roughly 12 minutes minimum instead of nearly 13 days.
+Do not use it for the actual playthrough.
+
+    /gamemode spectator
+    /function flusgrid:setup_smoke
+    /function flusgrid:realm_status
+
+Leave the world running until the controller is ready. Then build and light
+Nether portals in Creative on broad solid approach platforms, and switch
+to Survival to test. A Nether portal well inside the prepared Nether
+(e.g. near X=96) can link to an Overworld destination far beyond the
+tiny initial area. The first crossing should enqueue that Overworld tile
+and attempt to return you to your Nether approach with a warning.
+Once the queued tile completes, crossing again should be accepted.
+Stay on foot and allow time for a safe checkpoint to be recorded at least
+three blocks from any portal. The player should not run any function to
+activate travel protection.
+
+**Record:** title/action-bar display, exact returned dimension/position,
+whether the job started automatically, whether crossing works after it
+finishes, any loop or suffocation, and checkpoint failure behavior. Do not
+test the feature on the real Flunkstar world.
+
 ## Automatic regions after setup
 
 The new scheduler **does not convert one enormous edge strip**. When a
