@@ -99,6 +99,8 @@ class TenK(unittest.TestCase):
             self.assertIn("scoreboard players add #ex flusgrid 496",s)
             self.assertIn("scoreboard players add #ez flusgrid 496",s)
             self.assertIn(f"chunks:1024,total:{cubes}",s)
+            self.assertIn("data merge storage flusgrid:realm {rectangle:{",s)
+            self.assertNotIn("data merge storage flusgrid:realm rectangle {",s)
         for dim in ("overworld","nether","end"):
             self.assertIn("remove #target_x", self.load("neighbor_"+dim+"_west"))
             self.assertIn("remove #target_z", self.load("neighbor_"+dim+"_north"))
