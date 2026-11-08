@@ -53,8 +53,12 @@ Do not use it for the actual playthrough.
     /function flusgrid:setup_smoke
     /function flusgrid:realm_status
 
-Leave the world running until the controller is ready. Then build and light
-Nether portals in Creative on broad solid approach platforms, and switch
+Leave the world running until the controller is ready. Walk toward
+the initial region's edge **in Creative** to confirm that a new tile is
+automatically queued without being teleported. Check
+/function flusgrid:realm_status or
+/data get storage flusgrid:realm queue to observe the work.
+Then build and light Nether portals in Creative on broad solid approach platforms, and switch
 to Survival to test. A Nether portal well inside the prepared Nether
 (e.g. near X=96) can link to an Overworld destination far beyond the
 tiny initial area. The first crossing should enqueue that Overworld tile
@@ -88,10 +92,18 @@ boundary, which safely skips already completed cubes. A tile uses
 
 ## Travel handling
 
-At each game tick, players are checked against the initial 10K square
-and completed remote tiles. Players who enter unfinished terrain trigger
-a tile request and are returned to their last *recorded safe approach*
-instead of being sent to world spawn. The checkpoint is updated
+At each game tick, Creative, Survival and Adventure players are checked
+against the initial 10K square and completed remote tiles. All three modes
+automatically queue unfinished neighboring or destination regions.
+
+**Creative:** gridding requests are automatic, but the player is never
+teleported back by the FlusGrid frontier guard. Creative can fly through
+unprepared terrain while the queue works; terrain is *not* gridded instantly.
+
+**Survival/Adventure:** unfinished terrain triggers an automatic request,
+and the player is returned to the last *recorded safe approach* instead
+of being sent to world spawn. **Spectator:** exempt from both region
+requests and the movement safeguard. The checkpoint is updated
 automatically while the player is grounded, with a 3×3 clear
 approach, no nearby portal and exclusion of hazardous or air floors.
 No particular stone/obsidian/plank block is required. It retains dimension, position and
