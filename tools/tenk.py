@@ -100,13 +100,22 @@ def build_10k(pack, write, function):
         *[f'execute as @a[gamemode=!creative,gamemode=!spectator] at @s if dimension {dim} run function flusgrid:realm/player10_{short}'
           for short,ns,dim,top,low,sections in DIMS],
     ])
-    # Save only verified clear approach points, never a portal tile.
-    write('data/flusgrid/tags/block/safe_floor.json',json.dumps({'values':[
-        'minecraft:stone','minecraft:cobblestone','minecraft:obsidian','minecraft:crying_obsidian',
-        'minecraft:grass_block','minecraft:dirt','minecraft:netherrack','minecraft:end_stone',
-        'minecraft:deepslate','minecraft:cobbled_deepslate','minecraft:bedrock','#minecraft:planks']}))
-    safe=['scoreboard players set #safe flusgrid 1',
-          'execute unless block ~ ~-1 ~ #flusgrid:safe_floor run scoreboard players set #safe flusgrid 0']
+    # No particular standing block is required: save only when the
+    # player's OnGround flag confirms support. At return, inspect the
+    # stored location conservatively rather than trusting a whitelist.
+    # This still cannot detect every changed collision state (open trapdoors,
+    # removed support, etc.); full client testing remains mandatory.
+    hazard_floor = (
+        'air', 'cave_air', 'void_air', 'water', 'lava', 'fire', 'soul_fire',
+        'powder_snow', 'cactus', 'magma_block', 'campfire', 'soul_campfire',
+        'cobweb', 'sweet_berry_bush', 'pointed_dripstone', 'scaffolding',
+        'bubble_column',
+    )
+    safe = ['scoreboard players set #safe flusgrid 1']
+    safe += [
+        f'execute if block ~ ~-1 ~ minecraft:{block} run scoreboard players set #safe flusgrid 0'
+        for block in hazard_floor
+    ]
     for x in range(-1,2):
         for z in range(-1,2):
             for y in (0,1):
@@ -180,7 +189,7 @@ def build_10k(pack, write, function):
             f'execute if score #inside flusgrid matches 1 if score #main flusgrid matches 0 run function flusgrid:realm/request_neighbors_{short}',
             f'execute if score #inside flusgrid matches 0 run return run function flusgrid:realm/hold10_{short}',
             'function flusgrid:realm/checkpoint_safe',
-            'execute if score #safe flusgrid matches 1 run function flusgrid:realm/checkpoint',
+            'execute if score #safe flusgrid matches 1 if entity @s[nbt={OnGround:1b}] run function flusgrid:realm/checkpoint',
         ])
         f('request_here_'+short,[
             *[f'scoreboard players operation #target_{a} flusgrid = @s fg_{a}' for a in 'xz'],
