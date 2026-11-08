@@ -59,6 +59,24 @@ class TenK(unittest.TestCase):
         self.assertIn("minecraft:air",safe)
         self.assertNotIn("#flusgrid:safe_floor",safe)
 
+    def test_creative_requests_regions_without_teleport(self):
+        players = self.load("players10")
+        self.assertNotIn("gamemode=!creative", players)
+        self.assertIn("gamemode=!spectator", players)
+        for dim in ("overworld", "nether", "end"):
+            player = self.load("player10_" + dim)
+            self.assertIn("gamemode=creative", player)
+            creative = player.index("execute if entity @s[gamemode=creative] run return 1")
+            self.assertLess(player.index("request_here_" + dim), creative)
+            self.assertLess(player.index("request_main_" + dim), creative)
+            self.assertLess(player.index("request_neighbors_" + dim), creative)
+            self.assertLess(creative, player.index("hold10_" + dim))
+            self.assertNotIn("gamemode=creative", self.load("hold10_" + dim))
+        for name in ("tile_coords", "target_to_tile"):
+            code=self.load(name)
+            self.assertEqual(code.count("matches ..-1 run scoreboard players add #mod flusgrid 512"), 2)
+            self.assertLess(code.index("matches ..-1"),code.index("flusgrid -= #mod"))
+
     def test_persistent_queue_and_tile_sizes(self):
         load=self.load("load")
         self.assertIn("unless data storage flusgrid:realm queue",load)
