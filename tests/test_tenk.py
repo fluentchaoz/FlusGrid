@@ -29,6 +29,7 @@ class TenK(unittest.TestCase):
             player=self.load("player10_"+dim)
             self.assertIn("if score @s fg_x >= #bmin_x",player)
             self.assertIn("if score @s fg_z <= #bmax_z",player)
+            self.assertIn("nbt={OnGround:1b}",player)
 
     def test_queue_commits_only_after_completion(self):
         tick = self.load("tick")
@@ -52,6 +53,11 @@ class TenK(unittest.TestCase):
         self.assertLess(point.index("checkpoint_safe"),point.index("run tp"))
         self.assertNotIn("tp @s 0 ",point)
         self.assertIn("No loaded, clear checkpoint",self.load("return_failed"))
+        safe=self.load("checkpoint_safe")
+        self.assertIn("minecraft:water",safe)
+        self.assertIn("minecraft:lava",safe)
+        self.assertIn("minecraft:air",safe)
+        self.assertNotIn("#flusgrid:safe_floor",safe)
 
     def test_persistent_queue_and_tile_sizes(self):
         load=self.load("load")
