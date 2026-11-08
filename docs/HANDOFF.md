@@ -28,6 +28,15 @@ validation can still fail if source is unloaded or changed; in that case
 a red diagnostic is shown and no fake fallback is attempted. This is
 NOT yet a guarantee against entering ungridded terrain.
 
+**Creative feedback change:** Players in Creative now enter the same
+automatic tile-request scan as Survival/Adventure but return from the
+handler before the teleport guard; they keep flying/walking into unprepared
+areas while generation queues in the background. Spectator alone remains
+excluded from the scan. Negative X/Z tile targeting also now uses
+nonnegative modulo before alignment (Minecraft scoreboard remainder is
+negative for negative inputs). Regression contracts check both behaviors.
+
+
 **Remaining before promoting to main:** actual Java 26.3 player
 test of setup_smoke; check the first unprepared Nether portal crossing,
 message, accurate return point, automatic queued job, and accepting a
