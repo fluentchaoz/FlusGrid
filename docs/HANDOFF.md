@@ -8,6 +8,16 @@ Ryan wants a fresh RaysGrid-inspired Java 26.3 world, ultimately playable on Jav
 
 He successfully tested 0.1.0's stone grid and 0.2.0's actual full-height terrain grid. He proposed preparing terrain hundreds of blocks ahead to hide conversion. We agreed to bounded local pregeneration before Realms rather than promising live exploration performance. The next delivered milestone is a 512×512 preparation job.
 
+## Latest requested direction and isolated portal test
+
+After0.6, Ryan discussed25k targets, then changed to10k initial preparation with on-demand regions beyond it. Far Nether-linked destinations need separate prepared regions, not a single enormous rectangle. Those scheduler/region changes are NOT implemented. Current0.6 still uses the documented initial2048/2048/4096 setup and strips.
+
+Before implementing that larger change, Ryan authorized a small portal-return proof: return to the departure approach (not spawn), with an explanatory on-screen message. `tools/build_portal_test.py` builds standalone `portal-test/` and `dist/FlusGrid-portal-return-test-0.1.zip`. It does not mutate terrain, queue work, force-load or call the main pack. Main0.6 ZIP is unchanged. Run this only in a separate test world without an active FlusGrid guard.
+
+Opt in with `fg_portal_test:arm`, test one allowed crossing with `allow_next`, inspect `status`, stop with `off`. Per-player scoreboard checkpoints update on conservative full-block/open-air positions outside portal proximity. Dimension changes are detected after arrival. Valid source return uses dimension plus fixed-point coordinates/rotation. Invalid/unloaded sources or mounted transit disarm and leave the traveller at the destination with a diagnostic; no spawn fallback. This is not yet an access-control guarantee. Reload/reconnect/death disarms and needs rearming.
+
+Actual pig portal crossings passed both directions and simultaneous independent checkpoint tests. No connected-player/Realm client test yet; see TEST_RESULTS. Next step is Ryan's on-foot in-game test: return location, message visibility, no automatic loop, allow-next crossing, reverse direction. Do not claim player/vehicle/session behavior proven by pig fixtures. Only integrate a successful tested approach into the scheduler afterward.
+
 ## Current build: 0.6.0 — one-map controller and guarded frontier
 
 User now wants one pack that prepares Overworld, Nether and End in order, then starts large remote swaths as players approach. End should be gridded except pylon tops and exit/dragon podium. Add empty End portal centered at Overworld (0,-32,0), keeping the previous requirement to fill twelve Eyes.

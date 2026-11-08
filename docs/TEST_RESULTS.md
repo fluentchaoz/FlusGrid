@@ -1,5 +1,19 @@
 # Validation history
 
+## Standalone portal-return test 0.1 (2026-11-08)
+
+Separate `FlusGrid-portal-return-test-0.1.zip`; production 0.6 unchanged. Vanilla Java 26.3 / Java25, seed887314, local headless server. Pack loaded with no function/registry errors. Five new static tests pass; the shipping test ZIP has no terrain-edit or force-load commands and no calls into FlusGrid conversion.
+
+Actual paired Nether portals were constructed only in a disposable runtime fixture. A NoAI pig exercised real vanilla portal transport; fixture tick functions invoked the same dimension/checkpoint/return functions used for armed players. Fixture-specific heartbeat alignment bypassed the player reconnect check because function-tag ordering differs; this does not test player session behavior.
+
+- Overworld→Nether transit was rejected back to the exact recorded Overworld approach `(0.5,81,0.5)`, with return counter1 and destination dimension2. Assertions:0 failures.
+- `allow_next` let the next actual crossing remain in the Nether and consumed its allowance.
+- After a new Nether approach checkpoint was recorded, Nether→Overworld transit returned to the Nether approach; assertions:0 failures.
+- Two pigs crossing opposite directions retained independent checkpoints: Nether `(0.5,81,0.5)` and Overworld `(-3.5,81,0.5)`. Both returned correctly. No source coordinates were overwritten by the shared synchronous scratch storage.
+- Removing the departure checkpoint's floor after transit began caused the return to be refused and the test to disarm at the destination, rather than invent a fallback position.
+
+This establishes real **entity portal transport plus return logic**, not a connected-player or Realm result. Player title/action-bar rendering, camera/latency, Creative-vs-Survival portal timing, multiplayer clients, reconnect/death behavior and vehicles remain unverified. Fixture commands manually reset pig portal cooldown between some attempts to avoid waiting; the shipped pack never changes portal cooldown. No End portal/gateway test or terrain-generation scheduler is included. Follow PORTAL_RETURN_TEST.md for the player test.
+
 ## 0.6.0 campaign, End masks and frontier (2026-11-08)
 
 Actual vanilla Java26.3 / Zulu Java25.0.5.0.3, disposable headless seed887314. Final runtime loaded without function/registry errors. No Realms or graphical client session was performed.

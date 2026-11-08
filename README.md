@@ -22,6 +22,10 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 - [Development handoff](docs/HANDOFF.md)
 - [Earlier standalone dimension commands (0.5 history)](docs/DIMENSIONS.md)
 
+## Portal-return experiment
+
+A separate, opt-in test pack checks departure-point return after a dimension change. It does not grid terrain or implement the proposed 10k/on-demand region scheduler. [Download the test ZIP](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-portal-return-test-0.1.zip) · [Test instructions](docs/PORTAL_RETURN_TEST.md).
+
 ## Intended play workflow
 
 1. Develop and validate locally on Java 26.3.
