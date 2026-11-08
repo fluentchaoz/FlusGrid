@@ -13,7 +13,7 @@ scoreboard players operation #mod flusgrid = #pz flusgrid
 scoreboard players operation #mod flusgrid %= #sixteen flusgrid
 execute unless score #mod flusgrid matches 0 run return run tellraw @a {text:"FlusGrid: X and Z must be multiples of 16.",color:"red"}
 execute in minecraft:overworld run function flusgrid:pregen/release
-data merge storage flusgrid:job {kind:"pregen",state:"preparing",done:0,total:24576,chunks:0,percent:0,wait:0,reason:"",cursor:{y:304}}
+data merge storage flusgrid:job {kind:"pregen",state:"preparing",done:0,total:24576,chunks:0,chunk_total:1024,size:512,percent:0,wait:0,reason:"",cursor:{y:304}}
 data remove storage flusgrid:job pending
 execute store result storage flusgrid:job cursor.x int 1 run scoreboard players get #px flusgrid
 execute store result storage flusgrid:job min_x int 1 run scoreboard players get #px flusgrid

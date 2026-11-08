@@ -1,6 +1,11 @@
 """Bounded pre-generation: one owned force-load ticket and a compact cursor."""
 
 def build_pregen(function):
+    emitted = {}
+    output = function
+    def function(name, lines):
+        emitted[name] = lines
+        output(name, lines)
     function('pregen_here', [
         'execute unless entity @s[type=minecraft:player] run return 0',
         'execute unless dimension minecraft:overworld run return 0',
@@ -31,7 +36,7 @@ def build_pregen(function):
             'execute unless score #mod flusgrid matches 0 run return run tellraw @a {text:"FlusGrid: X and Z must be multiples of 16.",color:"red"}',
         ]],
         'execute in minecraft:overworld run function flusgrid:pregen/release',
-        'data merge storage flusgrid:job {kind:"pregen",state:"preparing",done:0,total:24576,chunks:0,percent:0,wait:0,reason:"",cursor:{y:304}}',
+        'data merge storage flusgrid:job {kind:"pregen",state:"preparing",done:0,total:24576,chunks:0,chunk_total:1024,size:512,percent:0,wait:0,reason:"",cursor:{y:304}}',
         'data remove storage flusgrid:job pending',
         *[line for axis in 'xz' for line in [
             f'execute store result storage flusgrid:job cursor.{axis} int 1 run scoreboard players get #p{axis} flusgrid',
@@ -48,7 +53,9 @@ def build_pregen(function):
         'execute in minecraft:overworld run function flusgrid:pregen/step',
     ])
     function('pregen/step', [
-        'execute if data storage flusgrid:job {done:24576} run return run function flusgrid:pregen/finish',
+        'execute store result score #done flusgrid run data get storage flusgrid:job done',
+        'execute store result score #target flusgrid run data get storage flusgrid:job total',
+        'execute if score #done flusgrid >= #target flusgrid run return run function flusgrid:pregen/finish',
         'execute unless data storage flusgrid:job ticket run return run function flusgrid:pregen/acquire with storage flusgrid:job cursor',
         'function flusgrid:pregen/process with storage flusgrid:job cursor',
     ])
@@ -64,7 +71,7 @@ def build_pregen(function):
     function('pregen/process', [
         '$execute positioned $(x) 0 $(z) unless loaded ~ ~ ~ run return run function flusgrid:pregen/wait',
         'data modify storage flusgrid:job wait set value 0',
-        '$execute if data storage flusgrid:ledger regions{"$(x),$(y),$(z)":"complete"} run return run function flusgrid:pregen/advance',
+        '$execute if data storage flusgrid:ledger regions{"$(x),$(y),$(z)":"complete"} run return run function flusgrid:pregen/skip with storage flusgrid:job cursor',
         '$execute if data storage flusgrid:ledger regions."$(x),$(y),$(z)" run return run function flusgrid:pregen/blocked',
         'data modify storage flusgrid:work origin set from storage flusgrid:job cursor',
         'scoreboard players set #quiet flusgrid 1',
@@ -96,12 +103,12 @@ def build_pregen(function):
         'execute store result storage flusgrid:job chunks int 1 run scoreboard players get #chunks flusgrid',
         'scoreboard players operation #percent flusgrid = #chunks flusgrid',
         'scoreboard players set #hundred flusgrid 100',
-        'scoreboard players set #chunk_total flusgrid 1024',
+        'execute store result score #chunk_total flusgrid run data get storage flusgrid:job chunk_total',
         'scoreboard players operation #percent flusgrid *= #hundred flusgrid',
         'scoreboard players operation #percent flusgrid /= #chunk_total flusgrid',
         'execute store result storage flusgrid:job percent int 1 run scoreboard players get #percent flusgrid',
-        'title @a actionbar [{text:"FlusGrid preparation: "},{nbt:"percent",storage:"flusgrid:job"},{text:"% | "},{nbt:"chunks",storage:"flusgrid:job"},{text:" / 1024 chunks"}]',
-        'execute if score #chunks flusgrid matches 1024 run return run function flusgrid:pregen/finish',
+        'title @a actionbar [{text:"FlusGrid preparation: "},{nbt:"percent",storage:"flusgrid:job"},{text:"% | "},{nbt:"chunks",storage:"flusgrid:job"},{text:" / "},{nbt:"chunk_total",storage:"flusgrid:job"},{text:" chunks"}]',
+        'execute if score #chunks flusgrid >= #chunk_total flusgrid run return run function flusgrid:pregen/finish',
         'data modify storage flusgrid:job cursor.y set value 304',
         'execute store result score #px flusgrid run data get storage flusgrid:job cursor.x',
         'execute store result score #max_x flusgrid run data get storage flusgrid:job max_x',
@@ -133,8 +140,13 @@ def build_pregen(function):
         'execute in minecraft:overworld run function flusgrid:pregen/release',
         'data modify storage flusgrid:job state set value "complete"',
         'data modify storage flusgrid:job reason set value ""',
-        'tellraw @a {text:"FlusGrid: 512x512 preparation complete! 1,024 chunks handled; owned force-load ticket released. Terrain beyond the prepared square remains normal.",color:"green"}',
+        'tellraw @a {text:"FlusGrid: preparation complete! All selected chunks handled; owned force-load ticket released. Terrain beyond the prepared square remains normal.",color:"green"}',
     ])
     function('pregen/status', [
-        'tellraw @a [{text:"FlusGrid pregen: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | "},{nbt:"percent",storage:"flusgrid:job"},{text:"% | chunks "},{nbt:"chunks",storage:"flusgrid:job"},{text:"/1024 | cubes "},{nbt:"done",storage:"flusgrid:job"},{text:"/24576 | next "},{nbt:"cursor",storage:"flusgrid:job"},{text:" | "},{nbt:"reason",storage:"flusgrid:job"}]',
+        'tellraw @a [{text:"FlusGrid pregen: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | "},{nbt:"percent",storage:"flusgrid:job"},{text:"% | chunks "},{nbt:"chunks",storage:"flusgrid:job"},{text:"/"},{nbt:"chunk_total",storage:"flusgrid:job"},{text:" | cubes "},{nbt:"done",storage:"flusgrid:job"},{text:"/"},{nbt:"total",storage:"flusgrid:job"},{text:" | next "},{nbt:"cursor",storage:"flusgrid:job"},{text:" | "},{nbt:"reason",storage:"flusgrid:job"}]',
     ])
+
+    function('pregen_2048_here', [line.replace('flusgrid 256', 'flusgrid 1024').replace('flusgrid:pregen_start ', 'flusgrid:pregen_2048_start ') for line in emitted['pregen_here']])
+    function('pregen_2048_start', [line.replace('32x32', '128x128').replace('512-block', '2048-block').replace('29999472', '29997936').replace('total:24576', 'total:393216').replace('chunk_total:1024', 'chunk_total:16384').replace('size:512', 'size:2048').replace('flusgrid 496', 'flusgrid 2032').replace('512x512', '2048x2048').replace('1,024 chunks', '16,384 chunks') for line in emitted['pregen_start']])
+
+    function('pregen/skip', ['$execute positioned $(x) $(y) $(z) run function flusgrid:internal/preserve_leaves', 'function flusgrid:pregen/advance'])

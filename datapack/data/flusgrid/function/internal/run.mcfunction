@@ -1,6 +1,7 @@
 execute unless loaded ~ ~ ~ run return run tellraw @a {text:"FlusGrid: target chunk is not loaded. Move closer and retry.",color:"red"}
 execute unless loaded ~15 ~15 ~15 run return 0
 $data modify storage flusgrid:ledger regions."$(x),$(y),$(z)" set value "started"
+function flusgrid:internal/preserve_leaves
 function flusgrid:internal/carve
 scoreboard players set #uncleared flusgrid 0
 function flusgrid:internal/verify

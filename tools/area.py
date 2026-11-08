@@ -63,7 +63,7 @@ def build_area(write, function):
         'function flusgrid:area/process with storage flusgrid:work origin',
     ])
     function('area/process', [
-        '$execute if data storage flusgrid:ledger regions{"$(x),$(y),$(z)":"complete"} run return run function flusgrid:area/advance',
+        '$execute if data storage flusgrid:ledger regions{"$(x),$(y),$(z)":"complete"} run return run function flusgrid:area/skip with storage flusgrid:work origin',
         '$execute if data storage flusgrid:ledger regions."$(x),$(y),$(z)" run return run function flusgrid:area/blocked',
         '$execute positioned $(x) $(y) $(z) unless loaded ~ ~ ~ run return run function flusgrid:area/unloaded',
         'scoreboard players set #quiet flusgrid 1',
@@ -88,3 +88,5 @@ def build_area(write, function):
     function('pause', ['execute in minecraft:overworld run function flusgrid:pregen/release','execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"','function flusgrid:status'])
     function('resume', ['execute unless data storage flusgrid:job {state:"paused"} run return run function flusgrid:status','data modify storage flusgrid:job wait set value 0','data modify storage flusgrid:job reason set value ""','data modify storage flusgrid:job state set value "running"','tellraw @a {text:"FlusGrid resumed. Keep this preparation world running.",color:"yellow"}'])
     function('status', ['execute if data storage flusgrid:job {kind:"pregen"} run return run function flusgrid:pregen/status','tellraw @a [{text:"FlusGrid job: ",color:"yellow"},{nbt:"state",storage:"flusgrid:job"},{text:" | cubes: "},{nbt:"done",storage:"flusgrid:job"},{text:" / "},{nbt:"total",storage:"flusgrid:job"},{text:" | next: "},{nbt:"pending[0]",storage:"flusgrid:job"}]'])
+
+    function('area/skip', ['$execute positioned $(x) $(y) $(z) run function flusgrid:internal/preserve_leaves', 'function flusgrid:area/advance'])

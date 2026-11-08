@@ -8,7 +8,17 @@ Ryan wants a fresh RaysGrid-inspired Java 26.3 world, ultimately playable on Jav
 
 He successfully tested 0.1.0's stone grid and 0.2.0's actual full-height terrain grid. He proposed preparing terrain hundreds of blocks ahead to hide conversion. We agreed to bounded local pregeneration before Realms rather than promising live exploration performance. The next delivered milestone is a 512×512 preparation job.
 
-## Current build: 0.3.0 experimental pregen
+## Current build: 0.4.0 — large prep and persistent leaves
+
+Ryan requested 2048×2048 prep code so he could start preparing while further development proceeds, and specifically asked to prevent leaves/other normal deterioration. This build adds `pregen_2048_here` and explicit `pregen_2048_start {x,z}` minimum-corner API. Size-specific start functions share a worker using job.total/chunk_total rather than hardcoded 512 counts. Old 512 commands remain unchanged; load migrates missing size/chunk_total on old pregen jobs. 2048 means 16,384 chunks / 393,216 cubes, at least 5h41m20s at normal tick rate before lag/waits. No optimization, ETA, border or new survival setup in this build.
+
+Leaf persistence is applied BEFORE removal, only to retained grid positions. `tools/leaves.py` enumerates all 14 species from the actual 26.3 vanilla leaves tag. Only persistent changes; distance, waterlogging and species remain. Previously completed cubes get leaf-only repair on skip, never re-clearing builds. Existing missing leaves cannot be recovered.
+
+Do not say all physics are frozen: fluids, falling blocks, grass/farmland and unsupported plants remain unresolved. No global random-tick rule is changed by the pack. Persistent leaves can still be mined/burned/exploded. Custom species outside vanilla are unsupported.
+
+The current guide is `docs/PREP_2048.md`; current ZIP is 0.4.0. Test details belong in TEST_RESULTS.md. A complete 2048 run is NOT yet validated/timed. The user's requested extra stability work needs further investigation; don't imply it happens asynchronously after a response.
+
+## Previous build: 0.3.0 experimental pregen
 
 `/function flusgrid:pregen_here` selects 32×32 chunks, from the caller's chunk minimum minus 256 on both axes, full height -64..319. Caller must be a Creative/Spectator player in the Overworld. Explicit minimum-corner API: `/function flusgrid:pregen_start {x:4096,z:4096}`.
 

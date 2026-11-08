@@ -28,7 +28,7 @@ def boxes():
                         yield (x,y,z,x,y,z+2)
 
 def build():
-    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.3.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
+    write('pack.mcmeta', json.dumps({'pack': {'description':'FlusGrid 0.4.0 — bounded experimental converter', 'min_format':[121,0], 'max_format':[121,0]}}, indent=2))
     write('data/minecraft/tags/function/load.json', json.dumps({'values':['flusgrid:load']}))
     function('load', [
         'scoreboard objectives add flusgrid dummy',
@@ -36,13 +36,17 @@ def build():
         'execute in minecraft:overworld run function flusgrid:pregen/release',
         'execute if data storage flusgrid:job {state:"running"} run data modify storage flusgrid:job state set value "paused"',
         'scoreboard players set #sixteen flusgrid 16',
+        'execute if data storage flusgrid:job {kind:"pregen"} unless data storage flusgrid:job chunk_total run data modify storage flusgrid:job chunk_total set value 1024',
+        'execute if data storage flusgrid:job {kind:"pregen"} unless data storage flusgrid:job size run data modify storage flusgrid:job size set value 512',
         'execute unless data storage flusgrid:ledger regions run data modify storage flusgrid:ledger regions set value {}',
     ])
     from area import build_area
     build_area(write, function)
     from pregen import build_pregen
     build_pregen(function)
-    function('help', ['tellraw @a {text:"FlusGrid 0.3.0: disposable Creative worlds only. /function flusgrid:pregen_here prepares 512x512 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Overworld only.",color:"yellow"}'])
+    from leaves import build_leaves
+    build_leaves(function)
+    function('help', ['tellraw @a {text:"FlusGrid 0.4.0: disposable Creative worlds only. /function flusgrid:pregen_2048_here prepares 2048x2048 terrain through full height. Controls: flusgrid:status, flusgrid:pause, flusgrid:resume. Overworld only.",color:"yellow"}'])
     function('convert', [
         '# Operator API. Explicit integer origins; no relative coordinates.',
         'execute if data storage flusgrid:job {state:"running"} run return 0',
@@ -70,6 +74,7 @@ def build():
         'execute unless loaded ~ ~ ~ run return run tellraw @a {text:"FlusGrid: target chunk is not loaded. Move closer and retry.",color:"red"}',
         'execute unless loaded ~15 ~15 ~15 run return 0',
         '$data modify storage flusgrid:ledger regions."$(x),$(y),$(z)" set value "started"',
+        'function flusgrid:internal/preserve_leaves',
         'function flusgrid:internal/carve',
         'scoreboard players set #uncleared flusgrid 0',
         'function flusgrid:internal/verify',
@@ -86,7 +91,7 @@ def build():
         for x in range(16) for y in range(16) for z in range(16)
         if x%4 or y%4 or z%4
     ])
-    out = ROOT / 'dist' / 'FlusGrid-0.3.0-experimental.zip'
+    out = ROOT / 'dist' / 'FlusGrid-0.4.0-experimental.zip'
     out.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         for p in sorted(PACK.rglob('*')):

@@ -1,5 +1,18 @@
 # Validation history
 
+## 0.4.0 leaves and 2048 entrypoint (2026-11-07)
+
+Tested against actual vanilla Java 26.3 / Java 25. The leaf list was extracted from the server's shipped block/leaves tag, not guessed.
+
+- All 14 vanilla species converted with persistent=true and preserved species/distance/waterlogging in the immediate assertion fixture. A separate waterlogged oak at distance 3 also retained those values. Fixture completion sentinel 1, failures 0.
+- After 100 stepped ticks with random_tick_speed=4096, all 14 dry persistent species survived and the untreated distance-7 oak control disappeared. Post-tick assertion failures 0. The test restored random_tick_speed=3; the datapack never changes it.
+- Explicit 2048 start produced 16,384 chunks / 393,216 cubes and correct bounds (minimum 4096, maximum chunk origin 6128). 154 natural chunks / 3,696 cubes actually processed, including crossing the 128-chunk row boundary, before manual pause. Its owned ticket was released; three test-fixture force-load tickets remained untouched.
+- Synthetic final-cube test: after explicitly injecting the final cursor/counts into the disposable test job, the worker completed the actual last cube, reached 16,384/393,216 and released its ticket. This tests the completion branch only, NOT full-area completion.
+- Revisited an old completed cube: a newly placed nonpersistent grid leaf became persistent, while a newly placed off-grid gold block survived.
+- Seven Python tests pass, including generated 2048 bounds/totals and all 196 leaf-state mappings (14 species × 7 distances × 2 waterlogged states).
+
+The full 2048 job has NOT been run to completion. No end-to-end time, late-run memory profile, graphical-player wrapper test or Realms validation is claimed. Other physics are still active. Leaves are protected from natural decay, not fire/explosions/player breaking.
+
 ## 0.3.0 bounded pre-generation (2026-11-07)
 
 **Full 512×512 run completed on vanilla Java 26.3 / Java 25.0.5.** Seed 887314, explicit minimum corner X/Z 4096, no players near the target. Bounds X/Z 4096..4607, Y -64..319. These are 100,663,296 potential block positions, with 1,572,864 grid positions retained where blocks originally existed.

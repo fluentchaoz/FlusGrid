@@ -12,12 +12,13 @@ A RaysGrid-inspired Minecraft Java survival project: keep naturally generated bl
 
 ## Status
 
-**0.3.0 experimental pre-generation:** `/function flusgrid:pregen_here` prepares a 512×512-block square through the full Overworld height. It generates distant chunks, converts one 16-cube per tick, tracks progress, and releases its temporary force-load ticket after each chunk. Pause, resume and reload/restart handling are included.
+**0.4.0 experimental preparation:** `/function flusgrid:pregen_2048_here` prepares a 2,048×2,048-block square through full height. The older `pregen_here` remains 512×512. Retained vanilla leaves are now explicitly persistent to prevent normal decay, preserving their species and waterlogging.
 
-This is bounded local preparation, not infinite automatic exploration or a Realms-ready survival release. Physics and progression work remain.
+The full 512 run was tested; the new 2048 job has startup, partial-processing and boundary tests, not an end-to-end completion benchmark. Other block physics and survival progression remain unfinished.
 
-- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.3.0-experimental.zip)
-- [Install and prepare 512×512](docs/PREGEN.md)
+- [Download the experimental datapack](https://github.com/fluentchaoz/FlusGrid/raw/refs/heads/main/dist/FlusGrid-0.4.0-experimental.zip)
+- [Install and prepare 2,048×2,048](docs/PREP_2048.md)
+- [Earlier 512×512 workflow](docs/PREGEN.md)
 - [Earlier 48×48 test](docs/TESTING.md)
 - [Test results](docs/TEST_RESULTS.md)
 - [Design plan](docs/DESIGN.md)
