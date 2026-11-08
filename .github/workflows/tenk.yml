@@ -25,6 +25,13 @@ jobs:
         run: python tools/build_portal_test.py
       - name: Run all Python contract tests
         run: python -m unittest discover -s tests -v
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Vanilla 26.3 runtime smoke test (queue dispatch)
+        timeout-minutes: 8
+        run: python tests/run_10k_runtime.py
       - name: Upload experimental ZIP
         uses: actions/upload-artifact@v4
         with:
