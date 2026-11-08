@@ -261,7 +261,7 @@ def build_10k(pack, write, function):
             'scoreboard players add #ez flusgrid 496',
             *[f'execute store result storage {S} rectangle.{a} int 1 run scoreboard players get #{src} flusgrid'
               for a,src in [('x','rx'),('z','rz'),('ex','ex'),('ez','ez')]],
-            f'data merge storage {S} rectangle {{chunks:1024,total:{1024*sections}}}',
+            f'data merge storage {S} {{rectangle:{{chunks:1024,total:{1024*sections}}}}}',
             f'execute in {dim} run function {ns}:pregen/rectangle with storage {S} rectangle',
             f'execute if data storage {ns}:job {{state:"running"}} run function flusgrid:realm/tile_claim_{short}',
         ])
