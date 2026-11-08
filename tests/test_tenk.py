@@ -10,15 +10,25 @@ class TenK(unittest.TestCase):
 
     def test_initial_bounds_and_counts(self):
         setup = (P.parent / "setup.mcfunction").read_text()
-        self.assertIn("model:10000", setup)
-        self.assertIn("x:-5008,z:-5008,ex:4976,ez:4976", setup)
-        self.assertIn("chunks:390625,total:9375000", setup)
-        for dim, cubes in [("overworld",9375000),("nether",6250000),("end",6250000)]:
-            complete = self.load("complete_" + dim)
-            self.assertIn("min_x:-5008,max_x:4991,min_z:-5008,max_z:4991",complete)
-            if dim != "end":
-                next_cubes = 6250000
-                self.assertIn(f"chunks:390625,total:{next_cubes}",complete)
+        smoke = (P.parent / "setup_smoke.mcfunction").read_text()
+        self.assertIn("model:10000",setup)
+        self.assertIn("min_x:-5008,max_x:4991", setup)
+        self.assertIn("min_x:-128,max_x:127", smoke)
+        self.assertIn("smoke:1b",smoke)
+        for dim, cubes, smoke_cubes in [
+            ("overworld",9375000,6144),
+            ("nether",6250000,4096),
+            ("end",6250000,4096),
+        ]:
+            complete=self.load("complete_"+dim)
+            self.assertIn("set from storage flusgrid:realm start_bounds",complete)
+            start=self.load("initial_start_"+dim)
+            self.assertIn("x:-5008,z:-5008,ex:4976,ez:4976",start)
+            self.assertIn(f"chunks:390625,total:{cubes}",start)
+            self.assertIn(f"chunks:256,total:{smoke_cubes}",start)
+            player=self.load("player10_"+dim)
+            self.assertIn("if score @s fg_x >= #bmin_x",player)
+            self.assertIn("if score @s fg_z <= #bmax_z",player)
 
     def test_queue_commits_only_after_completion(self):
         tick = self.load("tick")
