@@ -7,6 +7,6 @@ execute if data storage flusgrid_nether:job {state:"running"} run return run tel
 execute if data storage flusgrid_nether:job {state:"paused"} run return run tellraw @a {text:"Finish the existing nether preparation before setup.",color:"red"}
 execute if data storage flusgrid_end:job {state:"running"} run return run tellraw @a {text:"Finish the existing end preparation before setup.",color:"red"}
 execute if data storage flusgrid_end:job {state:"paused"} run return run tellraw @a {text:"Finish the existing end preparation before setup.",color:"red"}
-data merge storage flusgrid:realm {model:10000,state:"preparing",phase:"overworld",manual_pause:0b,live:0b,owner:"overworld"}
-execute in minecraft:overworld run function flusgrid:pregen/rectangle {x:-5008,z:-5008,ex:4976,ez:4976,chunks:390625,total:9375000}
-tellraw @a {text:"FlusGrid 10K setup started. Three 10,000-block-wide squares, one dimension at a time. This can require many days; status/pause/resume remain available.",color:"yellow"}
+data merge storage flusgrid:realm {model:10000,smoke:0b,edge_lead:256,state:"preparing",phase:"overworld",manual_pause:0b,live:0b,owner:"overworld",start_bounds:{min_x:-5008,max_x:4991,min_z:-5008,max_z:4991}}
+function flusgrid:realm/initial_start_overworld
+tellraw @a {text:"FlusGrid 10K setup started. Preparation may take many days; use realm_status.",color:"yellow"}
